@@ -1,0 +1,73 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- $hasRequests := false }}
+{{- $hasRequestsMemory := false }}
+{{- $hasLimits := false }}
+{{- $hasLimitsCPU := false }}
+{{- $hasLimitsMemory := false }}
+
+{{- if .NodeTier.Resources.Requests }}
+  {{- $hasRequests = true }}
+  {{- if .NodeTier.Resources.Requests.Memory }}{{- $hasRequestsMemory = true }}{{- end}}
+{{- end}}
+
+{{- if .NodeTier.Resources.Limits }}
+  {{- $hasLimits = true }}
+  {{- if .NodeTier.Resources.Limits.CPU }}{{- $hasLimitsCPU = true }}{{- end}}
+  {{- if .NodeTier.Resources.Limits.Memory }}{{- $hasLimitsMemory = true }}{{- end}}
+{{- end}}
+
+{{- if not (and ($hasRequests) ($hasLimits)) }}
+# Cannot have empty patch, so this is effectively a no-op.
+- op: test
+  path: /spec/template/spec/containers/0/name
+  value: desktop
+{{- end}}
+
+{{- if $hasRequests }}
+###
+# CPU requests from Node Tier spec, or default.
+###
+- op: add
+  path: "/spec/template/spec/containers/0/resources/requests/cpu"
+  value: {{default "500m" .NodeTier.Resources.Requests.CPU}}
+{{- end}}
+
+{{- if $hasRequestsMemory }}
+###
+# Memory requests from Node Tier spec, or none.
+###
+- op: add
+  path: "/spec/template/spec/containers/0/resources/requests/memory"
+  value: {{.NodeTier.Resources.Requests.Memory}}
+{{- end}}
+
+{{- if $hasLimitsCPU }}
+###
+# CPU limits from Node Tier spec, or none
+###
+- op: add
+  path: "/spec/template/spec/containers/0/resources/limits/cpu"
+  value: {{.NodeTier.Resources.Limits.CPU}}
+{{- end}}
+
+{{- if $hasLimitsMemory }}
+###
+# Memory limits from Node Tier spec, or none
+###
+- op: add
+  path: "/spec/template/spec/containers/0/resources/limits/memory"
+  value: {{.NodeTier.Resources.Limits.Memory}}
+{{- end}}

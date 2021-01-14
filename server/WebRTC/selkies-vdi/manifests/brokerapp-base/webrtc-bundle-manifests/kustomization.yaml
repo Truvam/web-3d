@@ -1,0 +1,57 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  kube-app: webrtc-streaming
+
+generatorOptions:
+  # Generate stable ConfigMap names for compatability with the BrokerAppConfig configMapRef.
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: webrtc-gpu-streaming-manifests-1.4.0
+    files:
+      - resource-vdi-deploy.yaml.tmpl
+      - resource-vdi-statefulset.yaml.tmpl
+      - resource-vdi-egress-network-policy.yaml.tmpl
+      - resource-vdi-file-manager-config.yaml.tmpl
+      - resource-vdi-isolated-network-def.yaml.tmpl
+      - resource-vdi-shared-storage-nfs-pv.yaml.tmpl
+      - resource-vdi-shared-storage-ceph-secret.yaml.tmpl
+      - resource-vdi-shared-storage-smb-secret.yaml.tmpl
+      - resource-vdi-virtual-service.yaml.tmpl
+      - jsonpatch-deploy-cpu-memory.yaml.tmpl
+      - jsonpatch-deploy-dind.yaml.tmpl
+      - jsonpatch-deploy-file-manager.yaml.tmpl
+      - jsonpatch-deploy-idle-shutdown.yaml.tmpl
+      - jsonpatch-deploy-isolated-network.yaml.tmpl
+      - jsonpatch-deploy-persist.yaml.tmpl
+      - jsonpatch-deploy-virtual-mouse.yaml.tmpl
+      - jsonpatch-deploy-xpra.yaml.tmpl
+      - jsonpatch-deploy-recording.yaml.tmpl
+      - jsonpatch-deploy-squid-proxy.yaml.tmpl
+      - jsonpatch-deploy-shared-storage-cephfs.yaml.tmpl
+      - jsonpatch-deploy-app-proxy.yaml.tmpl
+      - jsonpatch-deploy-shared-storage-nfs.yaml.tmpl
+      - jsonpatch-deploy-shared-storage-smb.yaml.tmpl
+      - jsonpatch-deploy-user-pod-gpu.yaml.tmpl
+      - jsonpatch-deploy-user-pod-js.yaml.tmpl
+      - jsonpatch-service-selectors.yaml.tmpl
+      - jsonpatch-service-app-proxy.yaml.tmpl
+      - jsonpatch-service-file-manager.yaml.tmpl
+      - jsonpatch-virtualservice-app-proxy.yaml.tmpl
+      - jsonpatch-virtualservice-file-manager.yaml.tmpl

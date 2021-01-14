@@ -1,0 +1,154 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- $enableXpra := false }}
+{{- if .UserParams.enableXpra }}
+  {{- if eq .UserParams.enableXpra "true" }}
+    {{- $enableXpra = true }}
+  {{- end}}
+{{- end}}
+{{- if .AppParams.enableXpra }}
+  {{- if eq .AppParams.enableXpra "true" }}
+    {{- $enableXpra = true }}
+  {{- end}}
+{{- end}}
+
+{{- $xpraUploadDir := default "/mnt/uploads" .AppParams.xpraUploadsMountPath }}
+
+{{- if $enableXpra }}
+###
+# Change entrypoint of desktop container.
+###
+- op: replace
+  path: "/spec/template/spec/containers/0/command"
+  value: ["/bin/bash", "-c"]
+
+###
+# Change args to desktop container entrypoint
+###
+- op: replace
+  path: "/spec/template/spec/containers/0/args"
+  value:
+    - |
+      echo "Waiting for X server"
+      until [[ -e /var/run/appconfig/xpra_ready ]]; do sleep 1; done
+      [[ -f /var/run/appconfig/.Xauthority ]] && cp /var/run/appconfig/.Xauthority ${HOME}/
+      echo "X server is ready"
+
+      [[ -c /dev/nvidiactl ]] && (cd /tmp && sudo LD_LIBRARY_PATH=${LD_LIBRARY_PATH} DISPLAY=${DISPLAY} vulkaninfo >/dev/null)
+
+      # Create default desktop shortcuts.
+      mkdir -p ${HOME}/Desktop
+      find /etc/skel/Desktop -name "*.desktop" -exec ln -sf {} ${HOME}/Desktop/ \; 2>/dev/null || true
+
+      # Copy autostart shortcuts
+      mkdir -p ${HOME}/.config/autostart
+      find /etc/skel/Autostart -name "*.desktop" -exec ln -sf {} ${HOME}/.config/autostart/ \; 2>/dev/null|| true
+
+      while true; do
+        eval ${XPRA_ENTRYPOINT:-"xfdesktop --sm-client-disable -A"} &
+        PID=$!
+        if [[ "${XPRA_ENTRYPOINT}" =~ xfdesktop ]]; then
+          # Transparent background
+          xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/workspace0/color-style --create -t int -s 3
+          # No background image
+          xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/workspace0/image-style --create -t int -s 0
+        fi
+        wait $PID
+        sleep 2
+      done
+
+###
+# Add shared volume for xpra uploads
+# Inserting as first element to deconflict other patches that append.
+# See also: https://github.com/kubernetes-sigs/kustomize/issues/642
+###
+- op: add
+  path: "/spec/template/spec/volumes/0"
+  value:
+    name: xpra-uploads
+    emptyDir: {}
+
+###
+# Add shared volume to desktop container for xpra uploads to desktop container
+# Inserting as first element to deconflict other patches that append.
+# See also: https://github.com/kubernetes-sigs/kustomize/issues/642
+###
+- op: add
+  path: "/spec/template/spec/containers/0/volumeMounts/0"
+  value:
+    name: xpra-uploads
+    mountPath: {{ $xpraUploadDir }}
+
+###
+# Replace xserver container with xpra container.
+###
+- op: replace
+  path: "/spec/template/spec/containers/3"
+  value:
+    name: xpra
+    image: gcr.io/cloud-solutions-images/webrtc-gpu-streaming-xpra:latest
+    securityContext:
+      privileged: false
+      runAsUser: 1000
+    env:
+      - name: DISPLAY
+        value: ":0"
+      - name: PULSE_SERVER
+        value: "127.0.0.1:4713"
+      - name: XPRA_PORT
+        value: "8082"
+      - name: XPRA
+        value: "tcp://127.0.0.1:8082"
+      - name: XPRA_DOWNLOAD_DIR
+        value: "/mnt/downloads"
+      # Add environment vars from brokerappconfig spec.
+      {{- range $item := .AppSpec.AppEnv }}
+      - name: {{$item.Name}}
+        value: "{{$item.Value}}"
+      {{- end}}
+    volumeMounts:
+      - name: x11
+        mountPath: /tmp/.X11-unix
+      - name: config
+        mountPath: /var/run/appconfig
+      - name: xpra-uploads
+        mountPath: /mnt/downloads
+    ports:
+      - name: web
+        containerPort: 8082
+
+###
+# Remove webrtc container
+###
+- op: remove
+  path: "/spec/template/spec/containers/4"
+
+###
+# Remove signaling container
+###
+- op: remove
+  path: "/spec/template/spec/containers/4"
+
+###
+# Remove webrtc web container
+###
+- op: remove
+  path: "/spec/template/spec/containers/4"
+{{- else}}
+# Cannot have empty patch, so this is effectively a no-op.
+- op: test
+  path: /spec/template/spec/containers/0/name
+  value: desktop
+{{- end}}

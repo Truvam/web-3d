@@ -1,0 +1,89 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- $enableRecording := false }}
+{{- if .AppParams.enableRecording }}
+  {{- if eq .AppParams.enableRecording "true" }}
+    {{- $enableRecording = true }}
+  {{- end}}
+{{- end}}
+
+{{- if $enableRecording }}
+# Add shared hostpath volume
+- op: add
+  path: "/spec/template/spec/volumes/-"
+  value:
+    name: recording
+    hostPath:
+      path: "/tmp/webrtc_recordings/{{.User}}/{{.Timestamp}}"
+      type: DirectoryOrCreate
+
+# Add recording container
+- op: add
+  path: "/spec/template/spec/containers/-"
+  value:
+    name: recording
+    image: gcr.io/cloud-solutions-images/webrtc-gpu-streaming-gst-webrtc-app:latest
+    securityContext:
+      privileged: false
+    workingDir: /tmp/recording
+    command: ["/record.sh"]
+    env:
+      {{- if eq .NodeTier.Name "gpu" }}
+      - name: LD_LIBRARY_PATH
+        value: "/usr/local/nvidia/lib64:/usr/local/nvidia/cuda/lib64:/usr/local/nvidia/lib32"
+      {{- end}}
+      - name: GST_DEBUG
+        value: "*:2"
+      - name: DISPLAY
+        value: ":0"
+      - name: VDI_USER
+        value: "{{.User}}"
+      - name: VDI_APP
+        value: "{{.App}}"
+      - name: REC_VIDEO_FRAMERATE
+        value: "{{ default "5" .AppParams.recordingFramerate }}"
+      - name: REC_VIDEO_BITRATE
+        value: "{{ default "500" .AppParams.recordingBitrate }}"
+      # Add the userParams to the env prefixed with VDI_
+      {{- range $key, $value := .UserParams }}
+      - name: VDI_{{ $key }}
+        value: "{{ $value }}" 
+      {{- end}}
+    volumeMounts:
+      - name: x11
+        mountPath: /tmp/.X11-unix
+      - name: config
+        mountPath: /var/run/appconfig
+      - name: recording
+        mountPath: /tmp/recording
+    {{- if eq .NodeTier.Name "gpu" }}
+    resources:
+      limits:
+        nvidia.com/gpu: 1
+    {{- end}}
+    # Remove recording data from disk when pod shuts down.
+    lifecycle:
+      preStop:
+        exec:
+          command:
+            - /bin/bash
+            - -c
+            - rm -rf /tmp/recording/*
+{{- else}}
+# Cannot have empty patch, so this is effectively a no-op.
+- op: test
+  path: /spec/template/spec/containers/0/name
+  value: desktop
+{{- end}}
