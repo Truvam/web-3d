@@ -9,7 +9,7 @@
 # openbox desktop:
 #     x11docker --xdummy --gpu --dbus-daemon -- "-p 15500:15500" IMAGENAME startx
 #
-# Access in browser at adress:  http://localhost:15500/?sound=on
+# Access in browser at adress:  http://localhost:15500/
 
 FROM debian:buster
 
