@@ -157,6 +157,10 @@ class GSTWebRTCApp:
         # Set this to 0 for most streaming use cases.
         ximagesrc.set_property("use-damage", 0)
 
+        # Set the window to capture
+        # TODO Auto detect window
+        ximagesrc.set_property("xid", 0x3e00003)
+
         # Create capabilities for ximagesrc
         ximagesrc_caps = Gst.caps_from_string("video/x-raw")
 
