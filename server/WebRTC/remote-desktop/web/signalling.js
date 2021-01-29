@@ -102,6 +102,7 @@ class WebRTCDemoSignalling {
      * @param {String} message
      */
     _setStatus(message) {
+        console.log("_setStatus:signalling: " + message);
         if (this.onstatus !== null) {
             this.onstatus(message);
         }
@@ -113,6 +114,7 @@ class WebRTCDemoSignalling {
      * @param {String} message
      */
     _setDebug(message) {
+        console.log("_setDebug:signalling: " + message);
         if (this.ondebug !== null) {
             this.ondebug(message);
         }
@@ -125,6 +127,7 @@ class WebRTCDemoSignalling {
      * @param {String} message
      */
     _setError(message) {
+        console.log("_setError:signalling: " + message);
         if (this.onerror !== null) {
             this.onerror(message);
         }
@@ -294,5 +297,10 @@ class WebRTCDemoSignalling {
     sendSDP(sdp) {
         this._setDebug("sending local sdp: " + JSON.stringify(sdp));
         this._ws_conn.send(JSON.stringify({ 'sdp': sdp }));
+    }
+
+    printDebug() {
+        console.log("Server: " + this._server);
+        console.log("PeerID: " + this._peer_id);
     }
 }

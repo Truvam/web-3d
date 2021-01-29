@@ -162,6 +162,7 @@ class WebRTCDemo {
      * @param {String} message
      */
     _setStatus(message) {
+        console.log("_setStatus:webrtc: " + message);
         if (this.onstatus !== null) {
             this.onstatus(message);
         }
@@ -174,6 +175,7 @@ class WebRTCDemo {
      * @param {String} message
      */
     _setDebug(message) {
+        console.log("_setDebug:webrtc: " + message);
         if (this.ondebug !== null) {
             this.ondebug(message);
         }
@@ -186,6 +188,7 @@ class WebRTCDemo {
      * @param {String} message
      */
     _setError(message) {
+        console.log("_setError:webrtc: " + message);
         if (this.onerror !== null) {
             this.onerror(message);
         }
@@ -387,6 +390,7 @@ class WebRTCDemo {
      * @param {String} message
      */
     sendDataChannelMessage(message) {
+        console.log("sendDataChannelMessage: " + this._send_channel);
         if (this._send_channel.readyState === 'open') {
             this._send_channel.send(message);
         } else {

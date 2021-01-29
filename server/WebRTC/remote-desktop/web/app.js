@@ -234,8 +234,10 @@ var videoElement = document.getElementById("stream");
 
 // WebRTC entrypoint, connect to the signalling server
 /*global WebRTCDemoSignalling, WebRTCDemo*/
-var signalling = new WebRTCDemoSignalling(new URL("wss://" + window.location.host + "/" + app.appName + "/signalling/"), 1);
+var signalling = new WebRTCDemoSignalling(new URL("ws://127.0.0.1:8443"), 1);
 var webrtc = new WebRTCDemo(signalling, videoElement);
+
+signalling.printDebug();
 
 // Function to add timestamp to logs.
 var applyTimestamp = (msg) => {
@@ -433,6 +435,7 @@ navigator.permissions.query({
     };
 });
 
+/*
 // Check if editing is allowed.
 var checkPublishing = () => {
     fetch("/publish/" + app.appName)
@@ -453,7 +456,9 @@ var checkPublishing = () => {
         });
 }
 checkPublishing();
+*/
 
+/*
 // Fetch RTC configuration containing STUN/TURN servers.
 fetch("/turn/")
     .then(function (response) {
@@ -470,3 +475,7 @@ fetch("/turn/")
         webrtc.rtcPeerConfig = config;
         webrtc.connect();
     });
+*/
+
+app.windowResolution = webrtc.input.getWindowResolution();
+webrtc.connect();
