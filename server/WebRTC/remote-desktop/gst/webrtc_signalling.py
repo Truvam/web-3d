@@ -130,6 +130,7 @@ class WebRTCSignalling:
 
         """
         async for message in self.conn:
+            logger.debug("Message: " + message)
             if message == 'HELLO':
                 logger.info("connected")
                 await self.on_connect()
@@ -144,6 +145,7 @@ class WebRTCSignalling:
             else:
                 # Attempt to parse JSON SDP or ICE message
                 data = None
+                logger.debug("HERE PARSING JSON::")
                 try:
                     data = json.loads(message)
                 except Exception as e:

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import asyncio
 import http.client
@@ -12,63 +14,8 @@ import urllib.parse
 from webrtc_input import WebRTCInput
 from webrtc_signalling import WebRTCSignalling, WebRTCSignallingErrorNoPeer
 from gstwebrtc_app import GSTWebRTCApp
-
-
-def fetch_coturn(uri, user, auth_header_name):
-    """Fetches TURN uri from a coturn web API
-
-    Arguments:
-        uri {string} -- uri of coturn web service, example: http://localhost:8081/
-        user {string} -- username used to generate coturn credential, for example: <hostname>
-
-    Raises:
-        Exception -- if response http status code is >= 400
-
-    Returns:
-        [string] -- TURN URI used with gstwebrtcbin in the form of:
-                        turn://<user>:<password>@<host>:<port>
-                    NOTE that the user and password are URI encoded to escape special characters like '/'
-    """
-
-    parsed_uri = urllib.parse.urlparse(uri)
-
-    conn = http.client.HTTPConnection(parsed_uri.netloc)
-    auth_headers = {
-        auth_header_name: user
-    }
-
-    conn.request("GET", parsed_uri.path, headers=auth_headers)
-    resp = conn.getresponse()
-    if resp.status >= 400:
-        raise Exception(resp.reason)
-
-    ice_servers = json.loads(resp.read())['iceServers']
-    stun = turn = ice_servers[0]['urls'][0]
-    stun_host = stun.split(":")[1]
-    stun_port = stun.split(":")[2].split("?")[0]
-
-    stun_uri = "stun://%s:%s" % (
-        stun_host,
-        stun_port
-    )
-
-    turn_uris = []
-    for turn in ice_servers[1]['urls']:
-        turn_host = turn.split(':')[1]
-        turn_port = turn.split(':')[2].split('?')[0]
-        turn_user = ice_servers[1]['username']
-        turn_password = ice_servers[1]['credential']
-
-        turn_uri = "turn://%s:%s@%s:%s" % (
-            urllib.parse.quote(turn_user, safe=""),
-            urllib.parse.quote(turn_password, safe=""),
-            turn_host,
-            turn_port
-        )
-
-        turn_uris.append(turn_uri)
-
-    return stun_uri, turn_uris
+from gpu_monitor import GPUMonitor
+from metrics import Metrics
 
 
 def initiateArgs():
@@ -131,6 +78,9 @@ if __name__ == '__main__':
     my_id = 0
     peer_id = 1
 
+    # Initialize metrics server.
+    metrics = Metrics(int(args.metrics_port))
+
     # Signaling server
 
     # Initialize the signalling instance
@@ -151,7 +101,7 @@ if __name__ == '__main__':
 
     # [START main_setup]
     # Fetch the turn server and credentials
-    #stun_server, turn_servers = fetch_coturn(
+    # stun_server, turn_servers = fetch_coturn(
     #    args.coturn_web_uri, args.coturn_web_username, args.coturn_auth_header_name)
 
     # Create instance of app
@@ -176,7 +126,8 @@ if __name__ == '__main__':
     signalling.on_session = app.start_pipeline
 
     # Initialize the Xinput instance
-    webrtc_input = WebRTCInput()
+    webrtc_input = WebRTCInput(
+        args.uinput_mouse_socket, args.uinput_js_socket, args.enable_clipboard.lower())
 
     # Log message when data channel is open
     def data_channel_ready():
@@ -206,22 +157,39 @@ if __name__ == '__main__':
     # Send clipboard contents when requested
     webrtc_input.on_clipboard_read = lambda data: app.send_clipboard_data(data)
 
+    # Send client FPS to metrics
+    webrtc_input.on_client_fps = lambda fps: metrics.set_fps(fps)
+
+    # Send client latency to metrics
+    webrtc_input.on_client_latency = lambda latency_ms: metrics.set_latency(
+        latency_ms)
+
+    # Initialize GPU monitor
+    gpu_mon = GPUMonitor(enabled=args.encoder.startswith("nv"))
+
+    # Send the GPU stats when available.
+    def on_gpu_stats(load, memory_total, memory_used):
+        app.send_gpu_stats(load, memory_total, memory_used)
+        metrics.set_gpu_utilization(load * 100)
+
+    gpu_mon.on_stats = on_gpu_stats
+
     # [START main_start]
     # Connect to the signalling server and process messages.
     loop = asyncio.get_event_loop()
     try:
-        # metrics.start()
+        metrics.start()
         loop.run_until_complete(webrtc_input.connect())
         loop.run_in_executor(None, lambda: webrtc_input.start_clipboard())
-        # loop.run_in_executor(None, lambda: gpu_mon.start())
+        loop.run_in_executor(None, lambda: gpu_mon.start())
         loop.run_until_complete(signalling.connect())
         loop.run_until_complete(signalling.start())
     except Exception as e:
-        logging.error("Caught exception: %s" % e)
+        logging.exception("Caught exception: %s" % e)
         sys.exit(1)
     finally:
         webrtc_input.stop_clipboard()
         webrtc_input.disconnect()
-        # gpu_mon.stop()
+        gpu_mon.stop()
         sys.exit(0)
     # [END main_start]
