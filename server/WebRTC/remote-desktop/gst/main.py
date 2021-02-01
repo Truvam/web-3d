@@ -24,18 +24,6 @@ def initiateArgs():
                         default=os.environ.get(
                             'SIGNALLING_SERVER', 'ws://127.0.0.1:8443'),
                         help='Signalling server to connect to, default: "ws://127.0.0.1:8443"')
-    parser.add_argument('--coturn_web_uri',
-                        default=os.environ.get(
-                            'COTURN_WEB_URI', 'http://localhost:8081'),
-                        help='URI for coturn REST API service, example: http://localhost:8081')
-    parser.add_argument('--coturn_web_username',
-                        default=os.environ.get(
-                            'COTURN_WEB_USERNAME', socket.gethostname()),
-                        help='URI for coturn REST API service, default is the system hostname')
-    parser.add_argument('--coturn_auth_header_name',
-                        default=os.environ.get(
-                            'COTURN_AUTH_HEADER_NAME', 'x-auth-user'),
-                        help='header name to pass user to coturn web service')
     parser.add_argument('--uinput_mouse_socket',
                         default=os.environ.get('UINPUT_MOUSE_SOCKET', ''),
                         help='path to uinput mouse socket provided by uinput-device-plugin, if not provided, uinput is used directly.')
@@ -54,6 +42,9 @@ def initiateArgs():
     parser.add_argument('--encoder',
                         default=os.environ.get('WEBRTC_ENCODER', 'nvh264enc'),
                         help='gstreamer encoder plugin to use')
+    parser.add_argument('--app_name',
+                        default=os.environ.get('APP_NAME', 'firefox'),
+                        help='name of the application to stream')
     parser.add_argument('--metrics_port',
                         default=os.environ.get('METRICS_PORT', '8000'),
                         help='port to start metrics server on')
@@ -100,13 +91,10 @@ if __name__ == '__main__':
     signalling.on_connect = signalling.setup_call
 
     # [START main_setup]
-    # Fetch the turn server and credentials
-    # stun_server, turn_servers = fetch_coturn(
-    #    args.coturn_web_uri, args.coturn_web_username, args.coturn_auth_header_name)
 
     # Create instance of app
     app = GSTWebRTCApp("stun.l.google.com:19302", None, args.enable_audio ==
-                       "true", int(args.framerate), args.encoder)
+                       "true", int(args.framerate), args.encoder, args.app_name)
 
     # [END main_setup]
 

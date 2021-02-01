@@ -12,18 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from gi.repository import GstSdp
+from gi.repository import GstWebRTC
+from gi.repository import Gst
 import asyncio
 import base64
 import json
 import logging
+import subprocess
+import sys
 
 import gi
 gi.require_version("Gst", "1.0")
 gi.require_version('GstWebRTC', '1.0')
 gi.require_version('GstSdp', '1.0')
-from gi.repository import Gst
-from gi.repository import GstWebRTC
-from gi.repository import GstSdp
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("gstwebrtc_app")
@@ -34,7 +36,7 @@ class GSTWebRTCAppError(Exception):
 
 
 class GSTWebRTCApp:
-    def __init__(self, stun_server=None, turn_servers=None, audio=True, framerate=30, encoder=None):
+    def __init__(self, stun_server=None, turn_servers=None, audio=True, framerate=30, encoder=None, app_name="firefox"):
         """Initialize gstreamer webrtc app.
 
         Initializes GObjects and checks for required plugins.
@@ -53,6 +55,7 @@ class GSTWebRTCApp:
         self.webrtcbin = None
         self.data_channel = None
         self.encoder = encoder
+        self.app_name = app_name
 
         self.framerate = framerate
 
@@ -159,7 +162,7 @@ class GSTWebRTCApp:
 
         # Set the window to capture
         # TODO Auto detect window
-        ximagesrc.set_property("xid", 0x3e00003)
+        ximagesrc.set_property("xid", getXWindowID(self.app_name))
 
         # Create capabilities for ximagesrc
         ximagesrc_caps = Gst.caps_from_string("video/x-raw")
@@ -175,22 +178,34 @@ class GSTWebRTCApp:
         ximagesrc_capsfilter = Gst.ElementFactory.make("capsfilter")
         ximagesrc_capsfilter.set_property("caps", ximagesrc_caps)
 
-        if self.encoder in ["nvh264enc"]:
-            # Upload buffers from ximagesrc directly to CUDA memory where
-            # the colorspace conversion will be performed.
-            cudaupload = Gst.ElementFactory.make("cudaupload")
+        if self.encoder in ["nvh264enc", "nvh264enc_cuda"]:
+            if self.encoder == "nvh264enc_cuda":
+                # Upload buffers from ximagesrc directly to CUDA memory where
+                # the colorspace conversion will be performed.
+                videoscale = Gst.ElementFactory.make("cudaupload")
 
-            # Convert the colorspace from BGRx to NVENC compatible format.
-            # This is performed with CUDA which reduces the overall CPU load
-            # compared to using the software videoconvert element.
-            cudaconvert = Gst.ElementFactory.make("cudaconvert")
+                # Convert the colorspace from BGRx to NVENC compatible format.
+                # This is performed with CUDA which reduces the overall CPU load
+                # compared to using the software videoconvert element.
+                videoconvert = Gst.ElementFactory.make("cudaconvert")
 
-            # Convert ximagesrc BGRx format to I420 using cudaconvert.
-            # This is a more compatible format for client-side software decoders.
-            cudaconvert_caps = Gst.caps_from_string("video/x-raw(memory:CUDAMemory)")
-            cudaconvert_caps.set_value("format", "I420")
-            cudaconvert_capsfilter = Gst.ElementFactory.make("capsfilter")
-            cudaconvert_capsfilter.set_property("caps", cudaconvert_caps)
+                # Convert ximagesrc BGRx format to I420 using cudaconvert.
+                # This is a more compatible format for client-side software decoders.
+                videoconvert_caps = Gst.caps_from_string(
+                    "video/x-raw(memory:CUDAMemory)")
+                videoconvert_caps.set_value("format", "I420")
+                videoconvert_capsfilter = Gst.ElementFactory.make("capsfilter")
+                videoconvert_capsfilter.set_property("caps", videoconvert_caps)
+            else:
+                videoscale = Gst.ElementFactory.make("videoscale")
+
+                videoconvert = Gst.ElementFactory.make("videoconvert")
+
+                videoconvert_caps = Gst.caps_from_string(
+                    "video/x-raw")
+                videoconvert_caps.set_value("format", "I420")
+                videoconvert_capsfilter = Gst.ElementFactory.make("capsfilter")
+                videoconvert_capsfilter.set_property("caps", videoconvert_caps)
 
             # Create the nvh264enc element named nvenc.
             # This is the heart of the video pipeline that converts the raw
@@ -322,16 +337,17 @@ class GSTWebRTCApp:
             vpenc.set_property("target-bitrate", 2000*1000)
 
         else:
-            raise GSTWebRTCAppError("Unsupported encoder for pipeline: %s" % self.encoder)
+            raise GSTWebRTCAppError(
+                "Unsupported encoder for pipeline: %s" % self.encoder)
 
         # Add all elements to the pipeline.
         self.pipeline.add(ximagesrc)
         self.pipeline.add(ximagesrc_capsfilter)
 
-        if self.encoder == "nvh264enc":
-            self.pipeline.add(cudaupload)
-            self.pipeline.add(cudaconvert)
-            self.pipeline.add(cudaconvert_capsfilter)
+        if self.encoder.startswith("nvh264enc"):
+            self.pipeline.add(videoscale)
+            self.pipeline.add(videoconvert)
+            self.pipeline.add(videoconvert_capsfilter)
             self.pipeline.add(nvh264enc)
             self.pipeline.add(nvh264enc_capsfilter)
             self.pipeline.add(rtph264pay)
@@ -348,24 +364,25 @@ class GSTWebRTCApp:
         # Link the pipeline elements and raise exception of linking fails
         # due to incompatible element pad capabilities.
         if not Gst.Element.link(ximagesrc, ximagesrc_capsfilter):
-            raise GSTWebRTCAppError("Failed to link ximagesrc -> ximagesrc_capsfilter")
+            raise GSTWebRTCAppError(
+                "Failed to link ximagesrc -> ximagesrc_capsfilter")
 
-        if self.encoder == "nvh264enc":
-            if not Gst.Element.link(ximagesrc_capsfilter, cudaupload):
+        if self.encoder.startswith("nvh264enc"):
+            if not Gst.Element.link(ximagesrc_capsfilter, videoscale):
                 raise GSTWebRTCAppError(
-                    "Failed to link ximagesrc_capsfilter -> cudaupload")
+                    "Failed to link ximagesrc_capsfilter -> videoscale")
 
-            if not Gst.Element.link(cudaupload, cudaconvert):
+            if not Gst.Element.link(videoscale, videoconvert):
                 raise GSTWebRTCAppError(
-                    "Failed to link cudaupload -> cudaconvert")
+                    "Failed to link videoscale -> videoconvert")
 
-            if not Gst.Element.link(cudaconvert, cudaconvert_capsfilter):
+            if not Gst.Element.link(videoconvert, videoconvert_capsfilter):
                 raise GSTWebRTCAppError(
-                    "Failed to link cudaconvert -> cudaconvert_capsfilter")
+                    "Failed to link videoconvert -> videoconvert_capsfilter")
 
-            if not Gst.Element.link(cudaconvert_capsfilter, nvh264enc):
+            if not Gst.Element.link(videoconvert_capsfilter, nvh264enc):
                 raise GSTWebRTCAppError(
-                    "Failed to link cudaconvert_capsfilter -> nvh264enc")
+                    "Failed to link videoconvert_capsfilter -> nvh264enc")
 
             if not Gst.Element.link(nvh264enc, nvh264enc_capsfilter):
                 raise GSTWebRTCAppError(
@@ -497,7 +514,8 @@ class GSTWebRTCApp:
             raise GSTWebRTCAppError("Failed to link opusenc -> rtpopuspay")
 
         if not Gst.Element.link(rtpopuspay, rtpopuspay_queue):
-            raise GSTWebRTCAppError("Failed to link rtpopuspay -> rtpopuspay_queue")
+            raise GSTWebRTCAppError(
+                "Failed to link rtpopuspay -> rtpopuspay_queue")
 
         if not Gst.Element.link(rtpopuspay_queue, rtpopuspay_capsfilter):
             raise GSTWebRTCAppError(
@@ -519,9 +537,10 @@ class GSTWebRTCApp:
         required = ["opus", "nice", "webrtc", "dtls", "srtp", "rtp", "sctp",
                     "rtpmanager", "ximagesrc"]
 
-        supported = ["nvh264enc", "vp8enc", "vp9enc"]
+        supported = ["nvh264enc", "nvh264enc_cuda", "vp8enc", "vp9enc"]
         if self.encoder not in supported:
-            raise GSTWebRTCAppError('Unsupported encoder, must be one of: ' + ','.join(supported))
+            raise GSTWebRTCAppError(
+                'Unsupported encoder, must be one of: ' + ','.join(supported))
 
         if self.encoder.startswith("nv"):
             required.append("nvcodec")
@@ -592,7 +611,8 @@ class GSTWebRTCApp:
             element = Gst.Bin.get_by_name(self.pipeline, "vpenc")
             element.set_property("target-bitrate", bitrate*1000)
         else:
-            logger.warning("set_video_bitrate not supported with encoder: %s" % self.encoder)
+            logger.warning(
+                "set_video_bitrate not supported with encoder: %s" % self.encoder)
 
         self.__send_data_channel_message(
             "pipeline", {"status": "Video bitrate set to: %d" % bitrate})
@@ -772,3 +792,38 @@ class GSTWebRTCApp:
             'on-message-string', lambda _, msg: self.on_data_message(msg))
 
         logger.info("pipeline started")
+
+
+def getXWindowID(name):
+    xid = subprocess.check_output(
+        "wmctrl -l | grep -i " + name + " | awk '{print $1}'", shell=True).decode(sys.stdout.encoding).strip()
+
+    if xid == "":
+        logger.warning("There were no windows found with name: " + name)
+        if name == "firefox":
+            logger.info("Initiating process with name: " + name)
+            startProcessName(
+                name, ["--kiosk https://threejs.org/examples/?q=fb#webgl_loader_fbx"])
+            getXWindowID(name)
+        else:
+            raise GSTWebRTCAppError(
+                "There were no windows found with name: " + name
+                + ". Try to start the process manually")
+    else:
+        logger.debug("Window " + name + " found with id: " + xid)
+        return int(xid, 16)
+
+
+def startProcessName(name, args):
+    """Starts a process.
+
+        Starts a process with a given name and arguments.
+
+        Arguments:
+            name {[string]} -- Name of the process we want to start
+                                    name: "firefox"
+            name {[list of strings]} -- List of string containing the arguments:
+                                    args: ["--kiosk http://192.168.1.80:8080"]
+
+    """
+    pro = subprocess.call(name + " " + ' '.join(args), shell=True)
