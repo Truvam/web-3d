@@ -799,31 +799,9 @@ def getXWindowID(name):
         "wmctrl -l | grep -i " + name + " | awk '{print $1}'", shell=True).decode(sys.stdout.encoding).strip()
 
     if xid == "":
-        logger.warning("There were no windows found with name: " + name)
-        if name == "firefox":
-            logger.info("Initiating process with name: " + name)
-            startProcessName(
-                name, ["--kiosk https://threejs.org/examples/?q=fb#webgl_loader_fbx"])
-            getXWindowID(name)
-        else:
-            raise GSTWebRTCAppError(
-                "There were no windows found with name: " + name
-                + ". Try to start the process manually")
+        raise GSTWebRTCAppError(
+            "There were no windows found with name: " + name
+            + ". Try to start the process manually")
     else:
         logger.debug("Window " + name + " found with id: " + xid)
         return int(xid, 16)
-
-
-def startProcessName(name, args):
-    """Starts a process.
-
-        Starts a process with a given name and arguments.
-
-        Arguments:
-            name {[string]} -- Name of the process we want to start
-                                    name: "firefox"
-            name {[list of strings]} -- List of string containing the arguments:
-                                    args: ["--kiosk http://192.168.1.80:8080"]
-
-    """
-    pro = subprocess.call(name + " " + ' '.join(args), shell=True)
