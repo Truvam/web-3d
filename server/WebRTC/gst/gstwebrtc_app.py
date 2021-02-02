@@ -216,7 +216,7 @@ class GSTWebRTCApp:
             # Setting this to 0 will use the bitrate from the NVENC preset.
             # This parameter can be set while the pipeline is running using the
             # set_video_bitrate() method. This helps to match the available
-            # bandwidth. If set too high, the cliend side jitter buffer will
+            # bandwidth. If set too high, the client side jitter buffer will
             # not be unable to lock on to the stream and it will fail to render.
             nvh264enc.set_property("bitrate", 2000)
 

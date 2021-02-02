@@ -6,7 +6,7 @@ Based on:
 * https://github.com/selkies-project/selkies-vdi
 * https://github.com/centricular/gstwebrtc-demos/tree/master/signalling
 
-### gstwebrtc
+### GStreamer WebRTC Pipeline
 Running on docker (recommended):
 ```
 docker build -t server-gst --network=host .
@@ -24,7 +24,7 @@ Manually:
 ./simple_server.py --disable-ssl
 ```
 
-### Start firefox
+### Start Firefox
 ```
 firefox --kiosk https://threejs.org/examples/?q=fb#webgl_loader_fbx
 ```
@@ -59,7 +59,7 @@ wmctrl -l | grep -i firefox | awk '{print $1}'
 * Cuda Coverter not working (Not an implementation problem, but for some reason i'm not able to make gstreamer work with cuda properly)
 * vp9enc not working
 
-## Command to check if gstreamer is detecting NVENC
+## Commands to check if gstreamer is detecting NVENC
 ```
 gst-inspect-1.0 nvcodec
 ```
@@ -94,19 +94,18 @@ Plugin Details:
 ldconfig -p | grep -E 'libcuda|libnvidia|libnvcuvid.so'
 ```
 ```
-	libnvidia-ptxjitcompiler.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.1
-	libnvidia-opticalflow.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-opticalflow.so.1
-	libnvidia-opencl.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-opencl.so.1
-	libnvidia-ml.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
-	libnvidia-encode.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-encode.so.1
-	libnvidia-compiler.so.460.32.03 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-compiler.so.460.32.03
-	libnvidia-cfg.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-cfg.so.1
-	libnvidia-allocator.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-allocator.so.1
-	libnvcuvid.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvcuvid.so.1
-	libcudart.so.11.0 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so.11.0
-	libcudart.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so
-	libcuda.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libcuda.so.1
-
+libnvidia-ptxjitcompiler.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.1
+libnvidia-opticalflow.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-opticalflow.so.1
+libnvidia-opencl.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-opencl.so.1
+libnvidia-ml.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+libnvidia-encode.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-encode.so.1
+libnvidia-compiler.so.460.32.03 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-compiler.so.460.32.03
+libnvidia-cfg.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-cfg.so.1
+libnvidia-allocator.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-allocator.so.1
+libnvcuvid.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvcuvid.so.1
+libcudart.so.11.0 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so.11.0
+libcudart.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so
+libcuda.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libcuda.so.1
 ```
 
 Possible errors and solutions:
