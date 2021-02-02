@@ -290,6 +290,31 @@ class GSTWebRTCApp:
             # Create a capability filter for the rtph264pay_caps.
             rtph264pay_capsfilter = Gst.ElementFactory.make("capsfilter")
             rtph264pay_capsfilter.set_property("caps", rtph264pay_caps)
+        elif self.encoder in ["nvh265enc"]:
+            videoscale = Gst.ElementFactory.make("videoscale")
+            videoconvert = Gst.ElementFactory.make("videoconvert")
+            videoconvert_caps = Gst.caps_from_string(
+                "video/x-raw")
+            videoconvert_caps.set_value("format", "NV12")
+            videoconvert_capsfilter = Gst.ElementFactory.make("capsfilter")
+            videoconvert_capsfilter.set_property("caps", videoconvert_caps)
+            nvh265enc = Gst.ElementFactory.make("nvh265enc", "nvenc")
+            nvh265enc.set_property("bitrate", 2000)
+            nvh265enc.set_property("rc-mode", "cbr")
+            nvh265enc.set_property("gop-size", -1)
+            nvh265enc.set_property("qos", True)
+            nvh265enc.set_property("preset", "low-latency-hq")
+            nvh265enc_caps = Gst.caps_from_string("video/x-h265")
+            nvh265enc_caps.set_value("profile", "high")
+            nvh265enc_capsfilter = Gst.ElementFactory.make("capsfilter")
+            nvh265enc_capsilter.set_property("caps", nvh265enc_caps)
+            rtph265pay = Gst.ElementFactory.make("rtph265pay")
+            rtph265pay_caps = Gst.caps_from_string("application/x-rtp")
+            rtph264pay_caps.set_value("media", "video")
+            rtph265pay_caps.set_value("encoding-name", "H265")
+            rtph265pay_caps.set_value("payload", 123)
+            rtph265pay_capsfilter = Gst.ElementFactory.make("capsfilter")
+            rtph265pay_capsfilter.set_property("caps", rtph265pay_caps)
 
         elif self.encoder in ["vp8enc", "vp9enc"]:
             videoconvert = Gst.ElementFactory.make("videoconvert")
@@ -537,7 +562,7 @@ class GSTWebRTCApp:
         required = ["opus", "nice", "webrtc", "dtls", "srtp", "rtp", "sctp",
                     "rtpmanager", "ximagesrc"]
 
-        supported = ["nvh264enc", "nvh264enc_cuda", "vp8enc", "vp9enc"]
+        supported = ["nvh264enc", "nvh264enc_cuda", "nvh265enc", "vp8enc", "vp9enc"]
         if self.encoder not in supported:
             raise GSTWebRTCAppError(
                 'Unsupported encoder, must be one of: ' + ','.join(supported))
