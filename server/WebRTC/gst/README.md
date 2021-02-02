@@ -32,3 +32,6 @@ optional arguments:
 * nvh264enc_cuda
 * vp8enc
 * vp9enc
+
+The supported encoders are dependent on the available GPU. More info about the support can be found here:
+* https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new
