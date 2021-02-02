@@ -1,7 +1,7 @@
 #!/bin/bash
 
 APP_NAME=firefox
-FRAMERATE=60
+FRAMERATE=30
 AUDIO=false
 
 python3 /opt/app/main.py --debug \
