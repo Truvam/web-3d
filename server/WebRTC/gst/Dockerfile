@@ -1,0 +1,246 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+FROM ubuntu:20.04
+
+# Install essentials
+RUN \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        curl \
+        build-essential \
+        ca-certificates \
+        git \
+        vim
+
+# CUDA START
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnupg2 curl ca-certificates && \
+    curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub | apt-key add - && \
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
+    echo "deb https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list && \
+    apt-get purge --autoremove -y curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV CUDA_VERSION 11.2.0
+
+# For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-cudart-11-2=11.2.72-1 \
+    cuda-compat-11-2 \
+    && ln -s cuda-11.2 /usr/local/cuda && \
+    rm -rf /var/lib/apt/lists/*
+
+# Required for nvidia-docker v1
+RUN echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf \
+    && echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf
+
+ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
+
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
+ENV NVIDIA_REQUIRE_CUDA "cuda>=11.2 brand=tesla,driver>=418,driver<419 brand=tesla,driver>=440,driver<441 driver>=450,driver<451"
+
+
+ENV NCCL_VERSION 2.8.3
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-libraries-11-2=11.2.0-1 \
+    libnpp-11-2=11.2.1.68-1 \
+    cuda-nvtx-11-2=11.2.67-1 \
+    libcublas-11-2=11.3.1.68-1 \
+    libnccl2=$NCCL_VERSION-1+cuda11.2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# apt from auto upgrading the cublas package. See https://gitlab.com/nvidia/container-images/cuda/-/issues/88
+RUN apt-mark hold libcublas-11-2 libnccl2
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libtinfo5 libncursesw5 \
+    cuda-cudart-dev-11-2=11.2.72-1 \
+    cuda-command-line-tools-11-2=11.2.0-1 \
+    cuda-minimal-build-11-2=11.2.0-1 \
+    cuda-libraries-dev-11-2=11.2.0-1 \
+    cuda-nvml-dev-11-2=11.2.67-1 \
+    libnpp-dev-11-2=11.2.1.68-1 \
+    libnccl-dev=2.8.3-1+cuda11.2 \
+    libcublas-dev-11-2=11.3.1.68-1 \
+    libcusparse-11-2=11.3.1.68-1 \
+    libcusparse-dev-11-2=11.3.1.68-1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# apt from auto upgrading the cublas package. See https://gitlab.com/nvidia/container-images/cuda/-/issues/88
+RUN apt-mark hold libcublas-dev-11-2 libnccl-dev
+ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
+
+# GST BASE START
+
+WORKDIR /opt
+
+# Checkout hashed commits with CUDA buffer support.
+# This can be removed once MR 1633 is on a release tag:
+#   https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/merge_requests/1633
+ARG GSTREAMER_VERSION=b71841c2d2f3759abc5ebe2703cc96c18da77dc9
+ARG GST_PLUGINS_BASE_VERSION=f5d971a19ea74f6dd624dcb66992bf955731e8c7
+ARG GST_PLUGINS_GOOD_VERSION=79efd372c12ae9117f3863d756296a22a4010c0f
+ARG GST_PLUGINS_BAD_VERSION=98eebf332287a6e26a0d7e0d56a094b7861d5cdf
+ARG GST_PLUGINS_UGLY_VERSION=a9105ad1e1fb8cbcf787c2a967697707eea405ed
+ARG GST_PYTHON_VERSION=7a0decbec242b026391ff6504f0619259aa34721
+
+# cloner repo for each gstreamer module
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gstreamer.git && cd gstreamer && git checkout ${GSTREAMER_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-base.git && cd gst-plugins-base && git checkout ${GST_PLUGINS_BASE_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-good && cd gst-plugins-good && git checkout ${GST_PLUGINS_GOOD_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad && cd gst-plugins-bad && git checkout ${GST_PLUGINS_BAD_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-ugly && cd gst-plugins-ugly && git checkout ${GST_PLUGINS_UGLY_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-python && cd gst-python && git checkout ${GST_PYTHON_VERSION}
+
+WORKDIR /opt
+
+# Install base build deps
+RUN \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        autopoint \
+        autoconf \
+        automake \
+        autotools-dev \
+        libtool \
+        gettext \
+        bison \
+        flex \
+        gtk-doc-tools \
+        libtool-bin \
+        libgtk2.0-dev \
+        libgl1-mesa-dev \
+        libopus-dev \
+        libpulse-dev \
+        libgirepository1.0-dev
+
+# Install meson build deps
+RUN \
+    apt-get update && apt install -y python3-pip python-gi-dev ninja-build && \
+    pip3 install meson
+
+# Build gstreamer
+RUN \
+    cd /opt/gstreamer && \
+    meson build --prefix=/usr && \
+    ninja -C build install
+
+# Build gstreamer-base
+RUN \
+    cd /opt/gst-plugins-base && \
+    meson build --prefix=/usr && \
+    ninja -C build install
+
+# Install deps for gst-plugins-good
+RUN \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libvpx-dev \
+        libvpx6
+
+# Build gst-plugins-good
+RUN \
+    cd /opt/gst-plugins-good && \
+    meson build --prefix=/usr && \
+    ninja -C build install
+
+# Build gst-instruments from source
+ARG GST_INSTRUMENTS_VERSION=0.2.4
+RUN \
+    cd /opt/ && \
+    git clone https://github.com/kirushyk/gst-instruments.git && \
+    cd gst-instruments && git checkout ${GST_INSTRUMENTS_VERSION} && \
+    ./autogen.sh --prefix=/usr && \
+    make -j8 && make install
+
+# Install deps for gst-plugins-bad
+RUN \
+    apt-get update && apt-get install -y --no-install-recommends \
+        libwebrtc-audio-processing-dev \
+        libssl-dev \
+        libsrtp2-dev
+
+# Install usrsctp from source
+ARG USRSCTP_VERSION=a948078b4e7078aed527a3dd6a52e95f9afdf187
+RUN \
+    git clone https://github.com/sctplab/usrsctp.git && \
+    cd usrsctp && git checkout ${USRSCTP_VERSION} && \
+    ./bootstrap && ./configure --prefix=/usr && \
+        make && make install && make clean
+
+# Install libnice from source
+ARG LIBNICE_VERSION=2b38ba23b726694293de53c90b59b28ca11746ab
+RUN \
+    git clone https://gitlab.freedesktop.org/libnice/libnice.git && \
+    cd libnice && git checkout ${LIBNICE_VERSION} && \
+    meson build --prefix=/usr && \
+    ninja -C build install
+
+# Install gst-plugins-bad from source
+RUN \
+    cd /opt/gst-plugins-bad && \
+    meson build --prefix=/usr && \
+    ninja -C build install
+
+# Install gst-python from source
+RUN \
+    cd /opt/gst-python && \
+    meson build --prefix=/usr \
+        -Dpygi-overrides-dir=/usr/lib/python3/dist-packages/gi/overrides && \
+    ninja -C build install
+
+# Install GstShark for latency tracing
+ARG GST_SHARK_VERSION=v0.6.1
+RUN \
+    apt-get update && apt install -y graphviz libgraphviz-dev && \
+    cd /opt && \
+    git clone --depth 1 https://github.com/RidgeRun/gst-shark -b ${GST_SHARK_VERSION} && \
+    cd gst-shark && ./autogen.sh --prefix=/usr && \
+        make && make install && make clean
+
+# Build and install gst-plugins-ugly from source
+# This package includes the x264 encoder for non-nvenc accelerated pipelines.
+RUN \
+    apt-get update && apt install -y libx264-155 libx264-dev
+
+RUN \
+    cd /opt/gst-plugins-ugly && \
+    meson build --prefix=/usr && \
+    ninja -C build install
+
+# WebRTC APP START
+RUN \
+    pip3 install websockets xlib gputil python-uinput prometheus_client msgpack pynput
+
+RUN \
+    apt-get update && apt-get install -y \
+        sudo \
+        udev \
+        xclip \
+        x11-utils \
+        xdotool \
+        wmctrl \
+        x11-xserver-utils
+
+# Build app
+WORKDIR /opt/app
+COPY *.py debug.sh /opt/app/
+
+COPY libnvidia-encode.so.1 /usr/lib/x86_64-linux-gnu/
+COPY libnvcuvid.so.1 /usr/lib/x86_64-linux-gnu/
+
+ENTRYPOINT ["bash"]
