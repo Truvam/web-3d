@@ -1,1 +1,0 @@
-Contains per-user bundle manifest templates when operating in Deployment mode.
