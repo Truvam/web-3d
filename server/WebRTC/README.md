@@ -63,7 +63,6 @@ wmctrl -l | grep -i firefox | awk '{print $1}'
 ```
 gst-inspect-1.0 nvcodec
 ```
-Example expected output:
 ```
 Plugin Details:
   Name                     nvcodec
@@ -91,9 +90,23 @@ Plugin Details:
   +-- 11 elements
 
 ```
-Checking for necessary libs:
 ```
 ldconfig -p | grep -E 'libcuda|libnvidia|libnvcuvid.so'
+```
+```
+	libnvidia-ptxjitcompiler.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.1
+	libnvidia-opticalflow.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-opticalflow.so.1
+	libnvidia-opencl.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-opencl.so.1
+	libnvidia-ml.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+	libnvidia-encode.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-encode.so.1
+	libnvidia-compiler.so.460.32.03 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-compiler.so.460.32.03
+	libnvidia-cfg.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-cfg.so.1
+	libnvidia-allocator.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvidia-allocator.so.1
+	libnvcuvid.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libnvcuvid.so.1
+	libcudart.so.11.0 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so.11.0
+	libcudart.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so
+	libcuda.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libcuda.so.1
+
 ```
 
 Possible errors and solutions:
