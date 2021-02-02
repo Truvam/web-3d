@@ -85,6 +85,7 @@ Plugin Details:
 ```
 Possible errors and solutions:
 * https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1469
+* https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1069
 * https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1068
 * https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1067
 
