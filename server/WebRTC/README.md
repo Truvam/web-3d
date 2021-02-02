@@ -7,8 +7,16 @@ Based on:
 * https://github.com/centricular/gstwebrtc-demos/tree/master/signalling
 
 ### gstwebrtc
+Running on docker (recommended):
 ```
-./main.py --app_name firefox --debug --framerate 60 --enable_audio false --server ws://192.168.1.80:8443 --encoder nvh264enc
+docker build -t server-gst --network=host .
+```
+```
+docker run -it --rm --gpus all --network=host -e ENCODER=nvh264enc server-gst
+```
+Manually:
+```
+./main.py --app_name firefox --debug --framerate 60 --enable_audio false --encoder nvh264enc
 ```
 
 ### Signalling
@@ -83,6 +91,11 @@ Plugin Details:
   +-- 11 elements
 
 ```
+Checking for necessary libs:
+```
+ldconfig -p | grep -E 'libcuda|libnvidia|libnvcuvid.so'
+```
+
 Possible errors and solutions:
 * https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1469
 * https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1069
