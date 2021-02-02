@@ -8,26 +8,12 @@ Based on:
 
 ### gstwebrtc
 ```
-cd /home/server/Desktop/web-3d/server/WebRTC/remote-desktop/gst
-```
-```
 ./main.py --app_name firefox --debug --framerate 60 --enable_audio false --server ws://192.168.1.80:8443 --encoder nvh264enc
 ```
 
 ### Signalling
 ```
-cd /home/server/Desktop/gstwebrtc-demos/signalling/
-```
-```
 ./simple_server.py --disable-ssl
-```
-
-### Web APP
-```
-cd /home/server/Desktop/web-3d/server/WebRTC/remote-desktop/web
-```
-```
-http-server -c-1
 ```
 
 ### Start firefox
