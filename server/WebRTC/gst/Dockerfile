@@ -109,7 +109,8 @@ RUN \
     apt-get update && apt-get install -y --no-install-recommends \
         libwebrtc-audio-processing-dev \
         libssl-dev \
-        libsrtp2-dev
+        libsrtp2-dev \
+        libx265-dev
 
 # Install usrsctp from source
 ARG USRSCTP_VERSION=a948078b4e7078aed527a3dd6a52e95f9afdf187
@@ -152,7 +153,7 @@ RUN \
 # Build and install gst-plugins-ugly from source
 # This package includes the x264 encoder for non-nvenc accelerated pipelines.
 RUN \
-    apt-get update && apt install -y libx264-155 libx264-dev libx265-dev
+    apt-get update && apt install -y libx264-155 libx264-dev
 
 RUN \
     cd /opt/gst-plugins-ugly && \

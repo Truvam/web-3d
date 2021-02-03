@@ -366,38 +366,38 @@ class GSTWebRTCApp:
             x26enc.set_property("speed-preset", "ultrafast")
 
         elif self.encoder in ["vp8enc", "vp9enc"]:
-            videoconvert=Gst.ElementFactory.make("videoconvert")
-            videoconvert_caps=Gst.caps_from_string("video/x-raw,format=I420")
-            videoconvert_capsfilter=Gst.ElementFactory.make("capsfilter")
+            videoconvert = Gst.ElementFactory.make("videoconvert")
+            videoconvert_caps = Gst.caps_from_string("video/x-raw,format=I420")
+            videoconvert_capsfilter = Gst.ElementFactory.make("capsfilter")
             videoconvert_capsfilter.set_property("caps", videoconvert_caps)
 
             if self.encoder == "vp8enc":
-                vpenc=Gst.ElementFactory.make("vp8enc", "vpenc")
-                vpenc_caps=Gst.caps_from_string("video/x-vp8")
-                vpenc_capsfilter=Gst.ElementFactory.make("capsfilter")
+                vpenc = Gst.ElementFactory.make("vp8enc", "vpenc")
+                vpenc_caps = Gst.caps_from_string("video/x-vp8")
+                vpenc_capsfilter = Gst.ElementFactory.make("capsfilter")
                 vpenc_capsfilter.set_property("caps", vpenc_caps)
 
-                rtpvppay=Gst.ElementFactory.make("rtpvp8pay")
-                rtpvppay_caps=Gst.caps_from_string("application/x-rtp")
+                rtpvppay = Gst.ElementFactory.make("rtpvp8pay")
+                rtpvppay_caps = Gst.caps_from_string("application/x-rtp")
                 rtpvppay_caps.set_value("media", "video")
                 rtpvppay_caps.set_value("encoding-name", "VP8")
                 rtpvppay_caps.set_value("payload", 123)
-                rtpvppay_capsfilter=Gst.ElementFactory.make("capsfilter")
+                rtpvppay_capsfilter = Gst.ElementFactory.make("capsfilter")
                 rtpvppay_capsfilter.set_property("caps", rtpvppay_caps)
 
             if self.encoder == "vp9enc":
-                vpenc=Gst.ElementFactory.make("vp9enc", "vpenc")
+                vpenc = Gst.ElementFactory.make("vp9enc", "vpenc")
                 vpenc.set_property("threads", 4)
-                vpenc_caps=Gst.caps_from_string("video/x-vp9")
-                vpenc_capsfilter=Gst.ElementFactory.make("capsfilter")
+                vpenc_caps = Gst.caps_from_string("video/x-vp9")
+                vpenc_capsfilter = Gst.ElementFactory.make("capsfilter")
                 vpenc_capsfilter.set_property("caps", vpenc_caps)
 
-                rtpvppay=Gst.ElementFactory.make("rtpvp9pay")
-                rtpvppay_caps=Gst.caps_from_string("application/x-rtp")
+                rtpvppay = Gst.ElementFactory.make("rtpvp9pay")
+                rtpvppay_caps = Gst.caps_from_string("application/x-rtp")
                 rtpvppay_caps.set_value("media", "video")
                 rtpvppay_caps.set_value("encoding-name", "VP9")
                 rtpvppay_caps.set_value("payload", 123)
-                rtpvppay_capsfilter=Gst.ElementFactory.make("capsfilter")
+                rtpvppay_capsfilter = Gst.ElementFactory.make("capsfilter")
                 rtpvppay_capsfilter.set_property("caps", rtpvppay_caps)
 
             # VPX Parameters
@@ -556,7 +556,7 @@ class GSTWebRTCApp:
         """
 
         # Create element for receiving audio from pulseaudio.
-        pulsesrc=Gst.ElementFactory.make("pulsesrc", "pulsesrc")
+        pulsesrc = Gst.ElementFactory.make("pulsesrc", "pulsesrc")
 
         # Let the audio source provide the global clock.
         # This is important when trying to keep the audio and video
@@ -570,7 +570,7 @@ class GSTWebRTCApp:
 
         # Encode the raw pulseaudio stream to opus format which is the
         # default packetized streaming format for the web.
-        opusenc=Gst.ElementFactory.make("opusenc", "opusenc")
+        opusenc = Gst.ElementFactory.make("opusenc", "opusenc")
 
         # Set audio bitrate to 64kbps.
         # This can be dynamically changed using set_audio_bitrate()
@@ -578,10 +578,10 @@ class GSTWebRTCApp:
 
         # Create the rtpopuspay element to convert buffers into
         # RTP packets that are sent over the connection transport.
-        rtpopuspay=Gst.ElementFactory.make("rtpopuspay")
+        rtpopuspay = Gst.ElementFactory.make("rtpopuspay")
 
         # Insert a queue for the RTP packets.
-        rtpopuspay_queue=Gst.ElementFactory.make("queue", "rtpopuspay_queue")
+        rtpopuspay_queue = Gst.ElementFactory.make("queue", "rtpopuspay_queue")
 
         # Make the queue leaky, so just drop packets if the queue is behind.
         rtpopuspay_queue.set_property("leaky", True)
@@ -597,7 +597,7 @@ class GSTWebRTCApp:
         rtpopuspay_queue.set_property("max-size-bytes", 0)
 
         # Set the capabilities for the rtpopuspay element.
-        rtpopuspay_caps=Gst.caps_from_string("application/x-rtp")
+        rtpopuspay_caps = Gst.caps_from_string("application/x-rtp")
 
         # Set the payload type to audio.
         rtpopuspay_caps.set_value("media", "audio")
@@ -612,7 +612,7 @@ class GSTWebRTCApp:
         rtpopuspay_caps.set_value("payload", 96)
 
         # Create a capability filter for the rtpopuspay_caps.
-        rtpopuspay_capsfilter=Gst.ElementFactory.make("capsfilter")
+        rtpopuspay_capsfilter = Gst.ElementFactory.make("capsfilter")
         rtpopuspay_capsfilter.set_property("caps", rtpopuspay_caps)
 
         # Add all elements to the pipeline.
@@ -651,10 +651,10 @@ class GSTWebRTCApp:
             GSTWebRTCAppError -- thrown if any plugins are missing.
         """
 
-        required=["opus", "nice", "webrtc", "dtls", "srtp", "rtp", "sctp",
+        required = ["opus", "nice", "webrtc", "dtls", "srtp", "rtp", "sctp",
                     "rtpmanager", "ximagesrc"]
 
-        supported=["nvh264enc", "nvh264enc_cuda",
+        supported = ["nvh264enc", "nvh264enc_cuda",
                      "nvh265enc", "x264enc", "x265enc", "vp8enc", "vp9enc"]
         if self.encoder not in supported:
             raise GSTWebRTCAppError(
@@ -666,7 +666,7 @@ class GSTWebRTCApp:
         if self.encoder.startswith("vp"):
             required.append("vpx")
 
-        missing=list(
+        missing = list(
             filter(lambda p: Gst.Registry.get().find_plugin(p) is None, required))
         if missing:
             raise GSTWebRTCAppError('Missing gstreamer plugins:', missing)
@@ -689,11 +689,11 @@ class GSTWebRTCApp:
         if sdp_type != 'answer':
             raise GSTWebRTCAppError('ERROR: sdp type was not "answer"')
 
-        _, sdpmsg=GstSdp.SDPMessage.new()
+        _, sdpmsg = GstSdp.SDPMessage.new()
         GstSdp.sdp_message_parse_buffer(bytes(sdp.encode()), sdpmsg)
-        answer=GstWebRTC.WebRTCSessionDescription.new(
+        answer = GstWebRTC.WebRTCSessionDescription.new(
             GstWebRTC.WebRTCSDPType.ANSWER, sdpmsg)
-        promise=Gst.Promise.new()
+        promise = Gst.Promise.new()
         self.webrtcbin.emit('set-remote-description', answer, promise)
         promise.interrupt()
 
@@ -723,13 +723,13 @@ class GSTWebRTCApp:
         """
 
         if self.encoder.startswith("nv"):
-            element=Gst.Bin.get_by_name(self.pipeline, "nvenc")
+            element = Gst.Bin.get_by_name(self.pipeline, "nvenc")
             element.set_property("bitrate", bitrate)
         elif self.encoder.startswith("x26"):
-            element=Gst.Bin.get_by_name(self.pipeline, "x26enc")
+            element = Gst.Bin.get_by_name(self.pipeline, "x26enc")
             element.set_property("bitrate", bitrate)
         elif self.encoder.startswith("vp"):
-            element=Gst.Bin.get_by_name(self.pipeline, "vpenc")
+            element = Gst.Bin.get_by_name(self.pipeline, "vpenc")
             element.set_property("target-bitrate", bitrate*1000)
         else:
             logger.warning(
@@ -746,7 +746,7 @@ class GSTWebRTCApp:
         """
 
         if self.audio:
-            element=Gst.Bin.get_by_name(self.pipeline, "opusenc")
+            element = Gst.Bin.get_by_name(self.pipeline, "opusenc")
             element.set_property("bitrate", bitrate)
             self.__send_data_channel_message(
                 "pipeline", {"status": "Audio bitrate set to: %d" % bitrate})
@@ -758,7 +758,7 @@ class GSTWebRTCApp:
             visible {bool} -- True to enable pointer visibility
         """
 
-        element=Gst.Bin.get_by_name(self.pipeline, "x11")
+        element = Gst.Bin.get_by_name(self.pipeline, "x11")
         element.set_property("show-pointer", visible)
         self.__send_data_channel_message(
             "pipeline", {"status": "Set pointer visibility to: %d" % visible})
@@ -830,7 +830,7 @@ class GSTWebRTCApp:
                 "skipping messaage because data channel is not ready: %s" % msg_type)
             return
 
-        msg={
+        msg = {
             "type": msg_type,
             "data": data,
         }
@@ -850,12 +850,12 @@ class GSTWebRTCApp:
         """
 
         promise.wait()
-        reply=promise.get_reply()
-        offer=reply.get_value('offer')
-        promise=Gst.Promise.new()
+        reply = promise.get_reply()
+        offer = reply.get_value('offer')
+        promise = Gst.Promise.new()
         self.webrtcbin.emit('set-local-description', offer, promise)
         promise.interrupt()
-        loop=asyncio.new_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(self.on_sdp('offer', offer.sdp.as_text()))
 
     def __on_negotiation_needed(self, webrtcbin):
@@ -866,7 +866,7 @@ class GSTWebRTCApp:
         """
 
         logger.info("handling on-negotiation-needed, creating offer.")
-        promise=Gst.Promise.new_with_change_func(
+        promise = Gst.Promise.new_with_change_func(
             self.__on_offer_created, webrtcbin, None)
         webrtcbin.emit('create-offer', None, promise)
 
@@ -880,7 +880,7 @@ class GSTWebRTCApp:
         """
 
         logger.debug("received ICE candidate: %d %s", mlineindex, candidate)
-        loop=asyncio.new_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(self.on_ice(mlineindex, candidate))
 
     def start_pipeline(self):
@@ -895,16 +895,16 @@ class GSTWebRTCApp:
             self.build_audio_pipeline()
 
         # Advance the state of the pipeline to PLAYING.
-        res=self.pipeline.set_state(Gst.State.PLAYING)
+        res = self.pipeline.set_state(Gst.State.PLAYING)
         if res.value_name != 'GST_STATE_CHANGE_SUCCESS':
             raise GSTWebRTCAppError(
                 "Failed to transition pipeline to PLAYING: %s" % res)
 
         # Create the data channel, this has to be done after the pipeline is PLAYING.
-        options=Gst.Structure("application/data-channel")
+        options = Gst.Structure("application/data-channel")
         options.set_value("ordered", True)
         options.set_value("max-retransmits", 0)
-        self.data_channel=self.webrtcbin.emit(
+        self.data_channel = self.webrtcbin.emit(
             'create-data-channel', "input", options)
         self.data_channel.connect('on-open', lambda _: self.on_data_open())
         self.data_channel.connect('on-close', lambda _: self.on_data_close())
@@ -916,7 +916,7 @@ class GSTWebRTCApp:
 
 
 def getXWindowID(name):
-    xid=subprocess.check_output(
+    xid = subprocess.check_output(
         "wmctrl -l | grep -i " + name + " | awk '{print $1}'", shell=True).decode(sys.stdout.encoding).strip()
 
     if xid == "":
