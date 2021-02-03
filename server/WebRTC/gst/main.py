@@ -24,6 +24,10 @@ def initiateArgs():
                         default=os.environ.get(
                             'SIGNALLING_SERVER', 'ws://127.0.0.1:8443'),
                         help='Signalling server to connect to, default: "ws://127.0.0.1:8443"')
+    parser.add_argument('--stun_server',
+                        default=os.environ.get(
+                            'STUN_SERVER', 'stun.l.google.com:19302'),
+                        help='STUN server to connect to, default: "stun.l.google.com:19302"')
     parser.add_argument('--uinput_mouse_socket',
                         default=os.environ.get('UINPUT_MOUSE_SOCKET', ''),
                         help='path to uinput mouse socket provided by uinput-device-plugin, if not provided, uinput is used directly.')
@@ -93,7 +97,7 @@ if __name__ == '__main__':
     # [START main_setup]
 
     # Create instance of app
-    app = GSTWebRTCApp("stun.l.google.com:19302", None, args.enable_audio ==
+    app = GSTWebRTCApp(args.stun_server, None, args.enable_audio ==
                        "true", int(args.framerate), args.encoder, args.app_name)
 
     # [END main_setup]
