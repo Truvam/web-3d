@@ -30,6 +30,8 @@ optional arguments:
 ## Supported encoders:
 * nvh264enc
 * nvh264enc_cuda
+* x264enc
+* x265enc
 * vp8enc
 * vp9enc
 

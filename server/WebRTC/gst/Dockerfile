@@ -152,7 +152,7 @@ RUN \
 # Build and install gst-plugins-ugly from source
 # This package includes the x264 encoder for non-nvenc accelerated pipelines.
 RUN \
-    apt-get update && apt install -y libx264-155 libx264-dev
+    apt-get update && apt install -y libx264-155 libx264-dev libx265-dev
 
 RUN \
     cd /opt/gst-plugins-ugly && \
@@ -182,6 +182,8 @@ ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
 # Set the DISPLAY variable.
 ENV DISPLAY :1
 VOLUME ["/tmp/.X11-unix:/tmp/.X11-unix:rw"]
+
+# docker run -it --rm --gpus all --env="DISPLAY" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" --network=host server-gst
 
 # Add entrypoint script
 COPY entrypoint.sh /

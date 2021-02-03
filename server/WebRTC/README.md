@@ -132,7 +132,13 @@ Other example with NVENC only:
 gst-launch-1.0 filesrc location=test.mp4 ! qtdemux ! h264parse ! nvh264dec ! videoscale ! "video/x-raw,width=1280,height=720" ! nvh264enc ! h264parse ! mp4mux ! filesink location=out.mp4
 ```
 
-## Others
-docker run -it --rm --gpus all --env="DISPLAY" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" --network=host gst-webrtc-app
+### Accelerated GStreamer User Guide: 
+Supported GPUs:
+* https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new
 
-export PATH=/usr/local/cuda-11.2/bin${PATH:+:${PATH}}
+CUDA Installation Guide:
+* https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html
+
+Pipeline Guides:
+* https://developer.download.nvidia.com/embedded/L4T/r32_Release_v1.0/Docs/Accelerated_GStreamer_User_Guide.pdf
+* https://docs.nvidia.com/jetson/l4t/index.html#page/Tegra%20Linux%20Driver%20Package%20Development%20Guide/accelerated_gstreamer.html#
