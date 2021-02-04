@@ -39,26 +39,6 @@ Command used to automate the retrieval of window ID, based on application name (
 wmctrl -l | grep -i firefox | awk '{print $1}'
 ```
 
-
-## TODO:
-* Keep checking sendrecv in order to understand how signalling works (DONE)
-* Check webrtc web app and try to change it in order to work (DONE)
-* Fix encoder for CUDA link (DONE, Cuda wasnt installed)
-* Check gstreamer uninstalled (DONE, No need to)
-* Fix signalling between devices
-* Test different pipelines without cuda (DONE)
-* Add nvh265 and add 265 and 264 without nvenc (For testing purposes)
-* Fix vp9enc
-* Add option to change app window size
-* Add option to import
-* Remove unnecessary code
-* Clean Overall project
-
-
-## Problems:
-* Cuda Coverter not working (Not an implementation problem, but for some reason i'm not able to make gstreamer work with cuda properly)
-* vp9enc not working
-
 ## Commands to check if gstreamer is detecting NVENC
 ```
 gst-inspect-1.0 nvcodec
@@ -142,3 +122,24 @@ CUDA Installation Guide:
 Pipeline Guides:
 * https://developer.download.nvidia.com/embedded/L4T/r32_Release_v1.0/Docs/Accelerated_GStreamer_User_Guide.pdf
 * https://docs.nvidia.com/jetson/l4t/index.html#page/Tegra%20Linux%20Driver%20Package%20Development%20Guide/accelerated_gstreamer.html#
+
+## TODO:
+* Keep checking sendrecv in order to understand how signalling works (DONE)
+* Check webrtc web app and try to change it in order to work (DONE)
+* Fix encoder for CUDA link (DONE, Cuda wasnt installed)
+* Check gstreamer uninstalled (DONE, No need to)
+* Test different pipelines without cuda (DONE)
+* Add nvh265 and add 265 and 264 without nvenc (For testing purposes) (DONE)
+* Fix signalling between devices (Done)
+* Fix vp9enc
+* Fix input:
+  * input isn't limited to the selected window
+  * add input for mobile devices gestures (three.js already supports this)
+* Improve UI in mobile devices
+* Add option to change app window size
+* Add option to import
+
+
+## Problems:
+* Cuda Coverter not working (Not an implementation problem, but for some reason i'm not able to make gstreamer work with cuda properly, GPU limitation?)
+* vp9enc not working (Again this might be a driver or hardware limitation)

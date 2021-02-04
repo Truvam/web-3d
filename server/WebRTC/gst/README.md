@@ -20,7 +20,7 @@ optional arguments:
                         enable or disable the clipboard features, supported values: true, false, in, out
   --framerate FRAMERATE
                         framerate of streaming pipeline
-  --encoder ENCODER     gstreamer encoder plugin to use
+  --encoder ENCODER     gstreamer encoder plugin to use, default: "nvh264enc"
   --app_name APP_NAME   name of the application to stream
   --metrics_port METRICS_PORT
                         port to start metrics server on
