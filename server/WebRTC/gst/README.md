@@ -2,7 +2,7 @@
 
 ## Usage:
 ```
-./main.py --app_name firefox --debug
+./main.py --app_name WebViewer --debug
 ```
 
 ## Arguments:

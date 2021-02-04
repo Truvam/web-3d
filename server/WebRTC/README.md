@@ -12,11 +12,11 @@ Running on docker (recommended):
 docker build -t server-gst --network=host .
 ```
 ```
-docker run -it --rm --gpus all --network=host -e ENCODER=nvh264enc server-gst
+docker run -it --rm --gpus all --network=host -e ENCODER=nvh264enc -e APP_NAME=WebViewer server-gst
 ```
 Manually:
 ```
-./main.py --app_name firefox --debug --framerate 60 --enable_audio false --encoder nvh264enc
+./main.py --app_name WebViewer --debug --framerate 60 --enable_audio false --encoder nvh264enc
 ```
 
 ### Signalling
@@ -26,7 +26,7 @@ Manually:
 
 ### Start Firefox
 ```
-firefox --kiosk https://threejs.org/examples/?q=fb#webgl_loader_fbx
+firefox --kiosk http://localhost:8181/
 ```
 
 ## Detect X Window ID
@@ -34,7 +34,7 @@ Gives X Window information of the clicked window:
 ```
 xwininfo
 ```
-Command used to automate the retrieval of window ID, based on application name (Method: "/Truvam/web-3d/blob/main/gstwebrtc_app.py#L797"):
+Command used to automate the retrieval of window ID, based on application name (Method: "https://github.com/Truvam/web-3d/blob/main/server/WebRTC/gst/gstwebrtc_app.py#L797"):
 ```
 wmctrl -l | grep -i firefox | awk '{print $1}'
 ```
