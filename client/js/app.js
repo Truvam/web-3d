@@ -234,7 +234,8 @@ var videoElement = document.getElementById("stream");
 
 // WebRTC entrypoint, connect to the signalling server
 /*global WebRTCDemoSignalling, WebRTCDemo*/
-var signalling = new WebRTCDemoSignalling(new URL("ws://127.0.0.1:8443"), 1);
+
+var signalling = new WebRTCDemoSignalling(new URL("ws://" + window.location.hostname + ":8443"), 1);
 var webrtc = new WebRTCDemo(signalling, videoElement);
 
 signalling.printDebug();
