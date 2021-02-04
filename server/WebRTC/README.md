@@ -29,6 +29,11 @@ Manually:
 firefox --kiosk http://localhost:8181/
 ```
 
+### Start Chrome (Chrome has better performance, need to check why)
+```
+google-chrome --start-fullscreen --app=http://localhost:8181
+```
+
 ## Detect X Window ID
 Gives X Window information of the clicked window:
 ```
