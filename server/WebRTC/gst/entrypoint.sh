@@ -1,6 +1,5 @@
 #!/bin/bash
 
-APP_NAME=firefox
 FRAMERATE=30
 AUDIO=false
 CLIPBOARD=false
