@@ -45,7 +45,7 @@ def initiateArgs():
                         help='framerate of streaming pipeline')
     parser.add_argument('--encoder',
                         default=os.environ.get('WEBRTC_ENCODER', 'nvh264enc'),
-                        help='gstreamer encoder plugin to use')
+                        help='gstreamer encoder plugin to use, default: "nvh264enc')
     parser.add_argument('--app_name',
                         default=os.environ.get('APP_NAME', 'firefox'),
                         help='name of the application to stream')
