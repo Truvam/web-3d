@@ -24,6 +24,10 @@ function getCookieValue(a) {
     return b ? b.pop() : '';
 }
 
+function gcd (a, b) {
+    return (b == 0) ? a : gcd (b, a%b);
+}
+
 var ScaleLoader = VueSpinner.ScaleLoader;
 
 var app = new Vue({
@@ -324,6 +328,16 @@ webrtc.onconnectionstatechange = (state) => {
 };
 
 webrtc.ondatachannelopen = () => {
+    var height = 1080;
+    var new_width = Math.round((1080*window.innerWidth)/window.innerHeight);
+    console.log("Setting initial window size to: " + new_width + "x" + height);
+    try {
+        webrtc.sendDataChannelMessage('cws,' + [new_width, height]);
+        var content = videoElement.innerHTML;
+        videoElement.innerHTML= content; 
+    } catch (e) {
+        console.log("Failed to set window size: ", e);
+    }
     var video_bit_rate = app.videoBitRate || (parseInt(window.localStorage.getItem("videoBitRate")) || 2000)
     console.log("Setting initial video bit rate to: " + video_bit_rate);
     try {
@@ -373,7 +387,13 @@ webrtc.input.onfullscreenhotkey = () => {
 
 webrtc.input.onresizeend = () => {
     app.windowResolution = webrtc.input.getWindowResolution();
-    // webrtc.sendDataChannelMessage('cws,' + app.windowResolution);
+
+    // The request to change window needs to be done before the stream starts
+    //alert(window.innerHeight)
+    //webrtc.sendDataChannelMessage('cws,' + app.windowResolution);
+    var height = 1080;
+    var new_width = Math.round((1080*window.innerWidth)/window.innerHeight);
+    webrtc.sendDataChannelMessage('cws,' + [new_width, height]);
     console.log(`Window size changed: ${app.windowResolution[0]}x${app.windowResolution[1]}`);
 }
 
@@ -440,48 +460,6 @@ navigator.permissions.query({
     };
 });
 
-/*
-// Check if editing is allowed.
-var checkPublishing = () => {
-    fetch("/publish/" + app.appName)
-        .then((response) => {
-            return response.json();
-        })
-        .then((response) => {
-            if (response.code < 400) {
-                app.publishingAllowed = true;
-                app.publishingIdle = true;
-            }
-            if (response.code === 201) {
-                app.publishingIdle = false;
-                setTimeout(() => {
-                    checkPublishing();
-                }, 1000);
-            }
-        });
-}
-checkPublishing();
-*/
-
-/*
-// Fetch RTC configuration containing STUN/TURN servers.
-fetch("/turn/")
-    .then(function (response) {
-        return response.json();
-    })
-    .then((config) => {
-        // for debugging, force use of relay server.
-        webrtc.forceTurn = app.turnSwitch;
-
-        // get initial local resolution
-        app.windowResolution = webrtc.input.getWindowResolution();
-
-        app.debugEntries.push(applyTimestamp("[app] using TURN servers: " + config.iceServers[1].urls.join(", ")));
-        webrtc.rtcPeerConfig = config;
-        webrtc.connect();
-    });
-*/
 
 app.windowResolution = webrtc.input.getWindowResolution();
-console.log(app.windowResolution);
 webrtc.connect();
