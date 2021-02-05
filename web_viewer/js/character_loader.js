@@ -93,7 +93,7 @@ function init() {
     controls.update();
 
     window.addEventListener('resize', onWindowResize, false);
-    changeWindowSize(393,729);
+    //changeWindowSize(393,729);
 
     // stats
     stats = new Stats();
@@ -106,7 +106,7 @@ function onWindowResize() {
 
 function changeWindowSize(width, height) {
     //393x729
-    alert("Changing Window to: " + width + "x" + height);
+    //alert("Changing Window to: " + width + "x" + height);
 
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
