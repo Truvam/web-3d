@@ -19,7 +19,6 @@ import asyncio
 import base64
 import json
 import logging
-import subprocess
 import sys
 
 import gi
@@ -36,7 +35,7 @@ class GSTWebRTCAppError(Exception):
 
 
 class GSTWebRTCApp:
-    def __init__(self, stun_server=None, turn_servers=None, audio=True, framerate=30, encoder=None, app_name="firefox"):
+    def __init__(self, stun_server=None, turn_servers=None, audio=True, framerate=30, encoder=None, windowID=None):
         """Initialize gstreamer webrtc app.
 
         Initializes GObjects and checks for required plugins.
@@ -55,7 +54,7 @@ class GSTWebRTCApp:
         self.webrtcbin = None
         self.data_channel = None
         self.encoder = encoder
-        self.app_name = app_name
+        self.windowID = windowID
 
         self.framerate = framerate
 
@@ -161,8 +160,8 @@ class GSTWebRTCApp:
         ximagesrc.set_property("use-damage", 0)
 
         # Set the window to capture
-        # TODO Auto detect window
-        ximagesrc.set_property("xid", getXWindowID(self.app_name))
+        if self.windowID:
+            ximagesrc.set_property("xid", self.windowID)
 
         # Create capabilities for ximagesrc
         ximagesrc_caps = Gst.caps_from_string("video/x-raw")
@@ -913,16 +912,3 @@ class GSTWebRTCApp:
             'on-message-string', lambda _, msg: self.on_data_message(msg))
 
         logger.info("pipeline started")
-
-
-def getXWindowID(name):
-    xid = subprocess.check_output(
-        "wmctrl -l | grep -i " + name + " | awk '{print $1}'", shell=True).decode(sys.stdout.encoding).strip()
-
-    if xid == "":
-        raise GSTWebRTCAppError(
-            "There were no windows found with name: " + name
-            + ". Try to start the process manually")
-    else:
-        logger.debug("Window " + name + " found with id: " + xid)
-        return int(xid, 16)

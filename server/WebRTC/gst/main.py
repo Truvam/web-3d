@@ -10,12 +10,26 @@ import socket
 import sys
 import time
 import urllib.parse
+import subprocess
 
 from webrtc_input import WebRTCInput
 from webrtc_signalling import WebRTCSignalling, WebRTCSignallingErrorNoPeer
 from gstwebrtc_app import GSTWebRTCApp
 from gpu_monitor import GPUMonitor
 from metrics import Metrics
+
+
+def getXWindowID(name):
+    xid = subprocess.check_output(
+        "wmctrl -l | grep -i " + name + " | awk '{print $1}'", shell=True).decode(sys.stdout.encoding).strip()
+
+    if xid == "":
+        raise GSTWebRTCAppError(
+            "There were no windows found with name: " + name
+            + ". Try to start the process manually")
+    else:
+        logging.debug("Window " + name + " found with id: " + xid)
+        return int(xid, 16)
 
 
 def initiateArgs():
@@ -98,7 +112,7 @@ if __name__ == '__main__':
 
     # Create instance of app
     app = GSTWebRTCApp(args.stun_server, None, args.enable_audio ==
-                       "true", int(args.framerate), args.encoder, args.app_name)
+                       "true", int(args.framerate), args.encoder, getXWindowID(args.app_name))
 
     # [END main_setup]
 
@@ -119,7 +133,7 @@ if __name__ == '__main__':
 
     # Initialize the Xinput instance
     webrtc_input = WebRTCInput(
-        args.uinput_mouse_socket, args.uinput_js_socket, args.enable_clipboard.lower())
+        args.uinput_mouse_socket, args.uinput_js_socket, args.enable_clipboard.lower(), getXWindowID(args.app_name))
 
     # Log message when data channel is open
     def data_channel_ready():
