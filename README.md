@@ -9,6 +9,7 @@
 * ~~Test different pipelines without cuda (DONE)~~
 * ~~Add nvh265 and add 265 and 264 without nvenc (For testing purposes) (DONE)~~
 * ~~Fix signalling between devices (Done, added windows.location.hostname)~~
+* Fix video stream not working on Windows (even on local network) might need a TURN server? (It's working on Ubuntu and Android)
 * Fix x265enc
 * Fix vp9enc (Stream starts but no video)
 * Fix input:
