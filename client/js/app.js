@@ -235,7 +235,10 @@ var videoElement = document.getElementById("stream");
 // WebRTC entrypoint, connect to the signalling server
 /*global WebRTCDemoSignalling, WebRTCDemo*/
 
-var signalling = new WebRTCDemoSignalling(new URL("ws://" + window.location.hostname + ":8443"), 1);
+//var signalling = new WebRTCDemoSignalling(new URL("ws://" + window.location.hostname + ":8443"), 1);
+
+// When using ngrok the URL needs to be hardcoded, otherwise it will try to establish connection with ngrok URL
+var signalling = new WebRTCDemoSignalling(new URL("ws://192.168.1.80:8443"), 1);
 var webrtc = new WebRTCDemo(signalling, videoElement);
 
 signalling.printDebug();
@@ -370,6 +373,7 @@ webrtc.input.onfullscreenhotkey = () => {
 
 webrtc.input.onresizeend = () => {
     app.windowResolution = webrtc.input.getWindowResolution();
+    // webrtc.sendDataChannelMessage('cws,' + app.windowResolution);
     console.log(`Window size changed: ${app.windowResolution[0]}x${app.windowResolution[1]}`);
 }
 
@@ -479,4 +483,5 @@ fetch("/turn/")
 */
 
 app.windowResolution = webrtc.input.getWindowResolution();
+console.log(app.windowResolution);
 webrtc.connect();

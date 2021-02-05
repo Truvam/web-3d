@@ -85,7 +85,7 @@ class WebRTCInputError(Exception):
 
 
 class WebRTCInput:
-    def __init__(self, uinput_mouse_socket_path="", uinput_js_socket_path="", enable_clipboard=""):
+    def __init__(self, uinput_mouse_socket_path="", uinput_js_socket_path="", enable_clipboard="", windowID=None):
         """Initializes WebRTC input instance
         """
         self.clipboard_running = False
@@ -96,6 +96,8 @@ class WebRTCInput:
         self.uinput_js_socket = None
 
         self.enable_clipboard = enable_clipboard
+
+        self.windowID = windowID
 
         self.mouse = None
         self.joystick = None
@@ -181,7 +183,7 @@ class WebRTCInput:
     async def connect(self):
         """Connects to X server
 
-        The target X server is determiend by the DISPLAY environment variable.
+        The target X server is determined by the DISPLAY environment variable.
         """
 
         self.xdisplay = display.Display()
@@ -372,6 +374,15 @@ class WebRTCInput:
         logger.info("stopping clipboard monitor")
         self.clipboard_running = False
 
+    def changeWindowSize(self, width, height):
+        if self.windowID:
+            logger.info("Changing window size to: " +
+                        str(width) + "x" + str(height))
+            window = self.xdisplay.create_resource_object(
+                'window', self.windowID)
+            window.configure(width=width, height=height)
+            self.xdisplay.sync()
+
     def on_message(self, msg):
         """Handles incoming input messages
 
@@ -486,5 +497,10 @@ class WebRTCInput:
             # Reported latency from client.
             latencty_ms = int(toks[1])
             self.on_client_latency(latencty_ms)
+        elif toks[0] == "cws":
+            # Change window size
+            width = int(toks[1])
+            height = int(toks[2])
+            self.changeWindowSize(width, height)
         else:
             logger.info('unknown data channel message: %s' % msg)
