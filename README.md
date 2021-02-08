@@ -16,7 +16,12 @@
   * input isn't limited to the selected window
   * add input for mobile devices gestures (three.js already supports this)
 * Improve UI in mobile devices
-* Add option to change app window size
+* Add option to change app window size (Almost done, might need to restart stream each time we change):
+  * Possible solutions:
+    * ~~Add resolution option to painel (Dynamic, 1920x1080, etc). (DONE)~~
+    * ~~Restart GST Pipeline. (DONE, reload page when window size changes)~~
+  * First solution might be the best, since the user might not want to change the streaming resolution.
+  * Fix fullscreen when on dynamic (Do not let resolution change when on fullscreen?).
 * Add option to import
 
 
