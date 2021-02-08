@@ -24,8 +24,13 @@ function getCookieValue(a) {
     return b ? b.pop() : '';
 }
 
-function gcd (a, b) {
-    return (b == 0) ? a : gcd (b, a%b);
+function getNewResolution(resolution) {
+    // Gives new resolution width and height, maintaining the previous resolution aspect ratio.
+    var width = resolution[0];
+    var height = resolution[1];
+    var default_height = 1080;
+    var new_width = Math.round((default_height * width) / height);
+    return [new_width, default_height];
 }
 
 var ScaleLoader = VueSpinner.ScaleLoader;
@@ -69,6 +74,12 @@ var app = new Vue({
                 { text: '256 kb/s', value: 256000 },
                 { text: '320 kb/s', value: 320000 },
             ],
+            windowResolution: (JSON.parse(window.localStorage.getItem("windowResolution")) || [1920, 1080]),
+            windowResolutionOptions: [
+                { text: 'Dynamic', value: [-1] },
+                { text: '1920 x 1080', value: [1920, 1080] },
+            ],
+            fullscreen: ((window.localStorage.getItem("fullscreen") === "true") || false),
             showStart: false,
             showDrawer: false,
             logEntries: [],
@@ -79,7 +90,7 @@ var app = new Vue({
             gamepadState: 'disconnected',
             gamepadName: 'none',
             audioEnabled: null,
-            windowResolution: "",
+            currentWindowResolution: [],
             connectionStatType: "unknown",
             connectionLatency: 0,
             connectionVideoLatency: 0,
@@ -137,6 +148,8 @@ var app = new Vue({
         },
         enterFullscreen() {
             // Request full screen mode.
+            app.fullscreen = !app.fullscreen;
+            window.localStorage.setItem("fullscreen", app.fullscreen);
             webrtc.element.parentElement.requestFullscreen();
         },
         playVideo() {
@@ -200,6 +213,25 @@ var app = new Vue({
         audioBitRate(newValue) {
             webrtc.sendDataChannelMessage('ab,' + newValue);
             window.localStorage.setItem("audioBitRate", newValue.toString());
+        },
+        windowResolution(newValue) {
+            if (newValue[0] == -1) {
+                console.log("Window resolution changed to Dynamic");
+                app.currentWindowResolution = webrtc.input.getWindowResolution();
+                console.log("Window resolution changed to " + app.currentWindowResolution[0] + "x" + app.currentWindowResolution[1]);
+                webrtc.sendDataChannelMessage('cws,' + getNewResolution(app.currentWindowResolution));
+            }
+            else {
+                console.log("Window resolution changed to " + newValue[0] + "x" + newValue[1]);
+                app.currentWindowResolution = newValue;
+                webrtc.sendDataChannelMessage('cws,' + newValue);
+            }
+            window.localStorage.setItem("windowResolution", JSON.stringify(newValue));
+
+            // Reload the page to force read of stored value on first load.
+            setTimeout(() => {
+                document.location.reload();
+            }, 700);
         },
         turnSwitch(newValue) {
             window.localStorage.setItem("turnSwitch", newValue.toString());
@@ -328,13 +360,15 @@ webrtc.onconnectionstatechange = (state) => {
 };
 
 webrtc.ondatachannelopen = () => {
-    var height = 1080;
-    var new_width = Math.round((1080*window.innerWidth)/window.innerHeight);
-    console.log("Setting initial window size to: " + new_width + "x" + height);
+    var window_resolution = app.windowResolution || JSON.parse((window.localStorage.getItem("windowResolution")) || [1920, 1080])
+    if (window_resolution == -1)
+        app.currentWindowResolution = webrtc.input.getWindowResolution();
+    else
+        app.currentWindowResolution = window_resolution;
+
+    console.log("Setting initial window size to: " + app.currentWindowResolution[0] + "x" + app.currentWindowResolution[1]);
     try {
-        webrtc.sendDataChannelMessage('cws,' + [new_width, height]);
-        var content = videoElement.innerHTML;
-        videoElement.innerHTML= content; 
+        webrtc.sendDataChannelMessage('cws,' + getNewResolution(app.currentWindowResolution));
     } catch (e) {
         console.log("Failed to set window size: ", e);
     }
@@ -386,15 +420,18 @@ webrtc.input.onfullscreenhotkey = () => {
 }
 
 webrtc.input.onresizeend = () => {
-    app.windowResolution = webrtc.input.getWindowResolution();
+    if (app.windowResolution[0] == -1) {
+        app.currentWindowResolution = webrtc.input.getWindowResolution();
+        webrtc.sendDataChannelMessage('cws,' + getNewResolution(app.currentWindowResolution));
+        console.log(`Dynamic window size changed: ${app.currentWindowResolution[0]}x${app.currentWindowResolution[1]}`);
 
-    // The request to change window needs to be done before the stream starts
-    //alert(window.innerHeight)
-    //webrtc.sendDataChannelMessage('cws,' + app.windowResolution);
-    var height = 1080;
-    var new_width = Math.round((1080*window.innerWidth)/window.innerHeight);
-    webrtc.sendDataChannelMessage('cws,' + [new_width, height]);
-    console.log(`Window size changed: ${app.windowResolution[0]}x${app.windowResolution[1]}`);
+        // Reload the page to force read of stored value on first load.
+
+        setTimeout(() => {
+            document.location.reload();
+        }, 700);
+
+    }
 }
 
 webrtc.onplayvideorequired = () => {
@@ -460,6 +497,4 @@ navigator.permissions.query({
     };
 });
 
-
-app.windowResolution = webrtc.input.getWindowResolution();
 webrtc.connect();
