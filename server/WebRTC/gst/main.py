@@ -61,7 +61,7 @@ def initiateArgs():
                         default=os.environ.get('WEBRTC_ENCODER', 'nvh264enc'),
                         help='gstreamer encoder plugin to use, default: "nvh264enc')
     parser.add_argument('--app_name',
-                        default=os.environ.get('APP_NAME', 'firefox'),
+                        default=os.environ.get('APP_NAME', ''),
                         help='name of the application to stream')
     parser.add_argument('--metrics_port',
                         default=os.environ.get('METRICS_PORT', '8000'),
