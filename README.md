@@ -20,9 +20,10 @@
   * Possible solutions:
     * ~~Add resolution option to painel (Dynamic, 1920x1080, etc). (DONE)~~
     * ~~Restart GST Pipeline. (DONE, reload page when window size changes)~~
-  * First solution might be the best, since the user might not want to change the streaming resolution.
   * Fix fullscreen when on dynamic (Do not let resolution change when on fullscreen?).
-* Add option to import
+* Add option to import fbx
+  * Will need to upload asset file to server
+  * Research on how to make this as secure as possible?
 
 
 ## Problems:
