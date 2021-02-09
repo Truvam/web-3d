@@ -32,12 +32,69 @@ def getXWindowID(name):
         return int(xid, 16)
 
 
+def fetch_coturn(uri, user, auth_header_name):
+    """Fetches TURN uri from a coturn web API
+
+    Arguments:
+        uri {string} -- uri of coturn web service, example: http://localhost:8081/
+        user {string} -- username used to generate coturn credential, for example: <hostname>
+
+    Raises:
+        Exception -- if response http status code is >= 400
+
+    Returns:
+        [string] -- TURN URI used with gstwebrtcbin in the form of:
+                        turn://<user>:<password>@<host>:<port>
+                    NOTE that the user and password are URI encoded to escape special characters like '/'
+    """
+
+    parsed_uri = urllib.parse.urlparse(uri)
+
+    conn = http.client.HTTPConnection(parsed_uri.netloc)
+    auth_headers = {
+        auth_header_name: user
+    }
+
+    conn.request("GET", parsed_uri.path, headers=auth_headers)
+    resp = conn.getresponse()
+    if resp.status >= 400:
+        raise Exception(resp.reason)
+
+    ice_servers = json.loads(resp.readline())['iceServers']
+    stun = turn = ice_servers[0]['urls'][0]
+    stun_host = stun.split(":")[1]
+    stun_port = stun.split(":")[2].split("?")[0]
+
+    stun_uri = "stun://%s:%s" % (
+        stun_host,
+        stun_port
+    )
+
+    turn_uris = []
+    for turn in ice_servers[1]['urls']:
+        turn_host = turn.split(':')[1]
+        turn_port = turn.split(':')[2].split('?')[0]
+        turn_user = ice_servers[1]['username']
+        turn_password = ice_servers[1]['credential']
+
+        turn_uri = "turn://%s:%s@%s:%s" % (
+            urllib.parse.quote(turn_user, safe=""),
+            urllib.parse.quote(turn_password, safe=""),
+            turn_host,
+            turn_port
+        )
+
+        turn_uris.append(turn_uri)
+
+    return stun_uri, turn_uris
+
+
 def initiateArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument('--server',
                         default=os.environ.get(
                             'SIGNALLING_SERVER', 'ws://127.0.0.1:8443'),
-                        help='Signalling server to connect to, default: "ws://127.0.0.1:8443"')
+                        help='Signalling server to connect to, default: "ws://192.168.1.80:8443"')
     parser.add_argument('--stun_server',
                         default=os.environ.get(
                             'STUN_SERVER', 'stun.l.google.com:19302'),
@@ -109,10 +166,15 @@ if __name__ == '__main__':
     signalling.on_connect = signalling.setup_call
 
     # [START main_setup]
+    # Fetch the turn server and credentials
+    stun_server, turn_servers = fetch_coturn(
+        "http://localhost:8081", "server", "x-auth-user")
 
     # Create instance of app
-    app = GSTWebRTCApp(args.stun_server, None, args.enable_audio ==
-                       "true", int(args.framerate), args.encoder, getXWindowID(args.app_name))
+    print(stun_server)
+    print(turn_servers)
+    app = GSTWebRTCApp(stun_server, turn_servers, args.enable_audio == "true",
+                       int(args.framerate), args.encoder, getXWindowID(args.app_name))
 
     # [END main_setup]
 

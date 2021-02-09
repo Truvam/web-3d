@@ -26,6 +26,7 @@ function getCookieValue(a) {
 
 function getNewResolution(resolution) {
     // Gives new resolution width and height, maintaining the previous resolution aspect ratio.
+    // Based on formula: https://andrew.hedges.name/experiments/aspect_ratio/
     var width = resolution[0];
     var height = resolution[1];
     var default_height = 1080;

@@ -127,3 +127,6 @@ CUDA Installation Guide:
 Pipeline Guides:
 * https://developer.download.nvidia.com/embedded/L4T/r32_Release_v1.0/Docs/Accelerated_GStreamer_User_Guide.pdf
 * https://docs.nvidia.com/jetson/l4t/index.html#page/Tegra%20Linux%20Driver%20Package%20Development%20Guide/accelerated_gstreamer.html#
+
+### COTURN
+docker run -it --rm --network=host --env TURN_SHARED_SECRET=$(openssl rand -hex 16) coturn-web
