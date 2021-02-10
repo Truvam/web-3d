@@ -7,8 +7,13 @@ function handleFiles() {
 }
 
 import Stats from 'https://unpkg.com/three@0.123.0/examples/jsm/libs/stats.module.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.123.0/examples/jsm/controls/OrbitControls.js';
 import { FBXLoader } from 'https://unpkg.com/three@0.123.0/examples/jsm/loaders/FBXLoader.js';
+
+import { OrbitControls } from 'https://unpkg.com/three@0.123.0/examples/jsm/controls/OrbitControls.js';
+import { PointerLockControls } from 'https://unpkg.com/three@0.123.0/examples/jsm/controls/PointerLockControls.js';
+
+import Controls from './controls.js';
+import { controlTypes } from './controls.js'
 
 var container, stats, controls;
 var camera, scene, renderer, light;
@@ -88,9 +93,8 @@ function init() {
     renderer.shadowMap.enabled = true;
     container.appendChild(renderer.domElement);
 
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 100, 0);
-    controls.update();
+    //controls = new Controls(controlTypes.ORBIT, camera, renderer.body);
+    controls = new Controls(controlTypes.POINTERLOCK, camera, renderer.body);
 
     window.addEventListener('resize', onWindowResize, false);
     //changeWindowSize(393,729);
@@ -105,9 +109,6 @@ function onWindowResize() {
 }
 
 function changeWindowSize(width, height) {
-    //393x729
-    //alert("Changing Window to: " + width + "x" + height);
-
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
 
