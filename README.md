@@ -24,6 +24,7 @@
 * Add option to import fbx
   * Will need to upload asset file to server
   * Research on how to make this as secure as possible?
+* Fix not working on firefox?
 
 
 ## Problems:
