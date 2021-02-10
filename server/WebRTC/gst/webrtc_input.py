@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from Xlib import X, XK, display, ext
+from ewmh import EWMH
 import base64
 import pynput
 import uinput
@@ -103,6 +104,8 @@ class WebRTCInput:
         self.joystick = None
         self.xdisplay = None
         self.button_mask = 0
+        self.ewmh = EWMH()
+        self.window = None
 
         self.on_video_encoder_bit_rate = lambda bitrate: logger.warn(
             'unhandled on_video_encoder_bit_rate')
@@ -187,6 +190,11 @@ class WebRTCInput:
         """
 
         self.xdisplay = display.Display()
+        self.window = self.xdisplay.create_resource_object(
+            'window', self.windowID)
+
+        self.ewmh.setActiveWindow(self.window)
+        self.ewmh.display.flush()
 
         # Clear any stuck modifier keys
         # self.reset_keyboard()
@@ -378,8 +386,7 @@ class WebRTCInput:
         if self.windowID:
             logger.info("Changing window size to: " +
                         str(width) + "x" + str(height))
-            window = self.xdisplay.create_resource_object(
-                'window', self.windowID)
+
             window.configure(width=width, height=height)
             self.xdisplay.sync()
 
