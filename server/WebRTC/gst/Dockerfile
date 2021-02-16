@@ -14,9 +14,11 @@
 
 FROM nvidia/cuda:11.2.0-devel-ubuntu20.04 
 
+ENV DEBIAN_FRONTEND noninteractive
+
 # Install essentials
 RUN \
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get update && apt-get install -y --no-install-recommends \
         curl \
         build-essential \
         ca-certificates \
@@ -49,7 +51,7 @@ WORKDIR /opt
 
 # Install base build deps
 RUN \
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get update && apt-get install -y --no-install-recommends \
         autopoint \
         autoconf \
         automake \
@@ -85,7 +87,7 @@ RUN \
 
 # Install deps for gst-plugins-good
 RUN \
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get update && apt-get install -y --no-install-recommends \
         libvpx-dev \
         libvpx6
 
