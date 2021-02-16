@@ -1,9 +1,9 @@
 ### Build docker image
 ````
-$ sudo docker build -t xpra_gpu .
+$ sudo docker build -t xpra .
 ````
 
 ### Initiate xpra
 ````
-$ x11docker --xdummy --gpu --dbus -- "-p 15500:15500" xpra_gpu start firefox-esr
+docker run --gpus all --rm -it -p 8082:8082 xpra
 ````
