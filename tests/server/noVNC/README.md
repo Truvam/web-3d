@@ -5,7 +5,7 @@ $ sudo docker build -t novnc .
 
 ### Initiate novnc
 ```
-docker run -it --rm -p 8082:8082 novnc
+docker run -it --rm -p 8080:8080 novnc
 ```
 
 ### Initiate vnc server
