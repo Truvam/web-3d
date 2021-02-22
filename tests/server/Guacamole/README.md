@@ -67,8 +67,8 @@ Pick window you want to display.
 
 ### Guacamole in Browser
 ```
-docker run --name example-guacd -d guacamole/guacd
+docker run -it --rm --network=host guacamole/guacd
 ```
 ```
-docker run --name example-guacamole --link example-guacd:guacd --link example-mysql:mysql -e MYSQL_DATABASE=guacamole_db -e MYSQL_USER=guacamole_user -e MYSQL_PASSWORD=guacamole_user_password -d -p 8080:8080 guacamole/guacamole
+docker run -it --rm -e MYSQL_HOSTNAME=172.17.0.2 -e MYSQL_DATABASE=guacamole_db -e MYSQL_USER=guacamole_user -e MYSQL_PASSWORD=guacamole_user_password -e GUACD_HOSTNAME=0.0.0.0 --network=host guacamole/guacamole
 ```
