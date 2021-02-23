@@ -363,6 +363,7 @@ class GSTWebRTCApp:
             x26enc.set_property("key-int-max", 60)
             x26enc.set_property("tune", "zerolatency")
             x26enc.set_property("speed-preset", "ultrafast")
+            x26enc.set_property("pass", "cbr")
 
         elif self.encoder in ["vp8enc", "vp9enc"]:
             videoconvert = Gst.ElementFactory.make("videoconvert")
