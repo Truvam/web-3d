@@ -42,10 +42,10 @@ ARG GST_PYTHON_VERSION=7a0decbec242b026391ff6504f0619259aa34721
 # cloner repo for each gstreamer module
 RUN git clone https://gitlab.freedesktop.org/gstreamer/gstreamer.git && cd gstreamer && git checkout ${GSTREAMER_VERSION}
 RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-base.git && cd gst-plugins-base && git checkout ${GST_PLUGINS_BASE_VERSION}
-RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-good && cd gst-plugins-good && git checkout ${GST_PLUGINS_GOOD_VERSION}
-RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad && cd gst-plugins-bad && git checkout ${GST_PLUGINS_BAD_VERSION}
-RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-ugly && cd gst-plugins-ugly && git checkout ${GST_PLUGINS_UGLY_VERSION}
-RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-python && cd gst-python && git checkout ${GST_PYTHON_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-good.git && cd gst-plugins-good && git checkout ${GST_PLUGINS_GOOD_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad.git && cd gst-plugins-bad && git checkout ${GST_PLUGINS_BAD_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-plugins-ugly.git && cd gst-plugins-ugly && git checkout ${GST_PLUGINS_UGLY_VERSION}
+RUN git clone https://gitlab.freedesktop.org/gstreamer/gst-python.git && cd gst-python && git checkout ${GST_PYTHON_VERSION}
 
 WORKDIR /opt
 
