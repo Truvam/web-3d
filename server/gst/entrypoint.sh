@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FRAMERATE=30
+FRAMERATE=60
 AUDIO=false
 CLIPBOARD=false
 
