@@ -24,11 +24,12 @@ function getCookieValue(a) {
     return b ? b.pop() : '';
 }
 
-function getNewResolution(resolution) {
+function getNewResolution(resolution, default_height) {
     // Gives new resolution width and height, maintaining the previous resolution aspect ratio.
     var width = resolution[0];
     var height = resolution[1];
-    var default_height = 1080;
+    if (height == 1080 || height == 720) var default_height = height;
+    else var default_height = 1080;
     var new_width = Math.round((default_height * width) / height);
     return [new_width, default_height];
 }
@@ -78,6 +79,7 @@ var app = new Vue({
             windowResolutionOptions: [
                 { text: 'Dynamic', value: [-1] },
                 { text: '1920 x 1080', value: [1920, 1080] },
+                { text: '1280 x 720', value: [1280, 720] },
             ],
             fullscreen: ((window.localStorage.getItem("fullscreen") === "true") || false),
             showStart: false,
