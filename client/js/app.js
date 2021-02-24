@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 /**
  * Fetch the value of a cookie by name.
  * @param {string} a
@@ -39,6 +40,7 @@ var ScaleLoader = VueSpinner.ScaleLoader;
 var app = new Vue({
 
     el: '#app',
+    vuetify: new Vuetify(),
 
     components: {
         ScaleLoader
