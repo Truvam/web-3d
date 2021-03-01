@@ -1,16 +1,5 @@
-//const file_path = document.getElementById("file-input");
-//file_path.addEventListener("change", handleFiles, false);
-function handleFiles() {
-    const file = this.files[0]; /* now you can work with the file list */
-
-    console.log(file);
-}
-
 import Stats from 'https://unpkg.com/three@0.123.0/examples/jsm/libs/stats.module.js';
 import { FBXLoader } from 'https://unpkg.com/three@0.123.0/examples/jsm/loaders/FBXLoader.js';
-
-import { OrbitControls } from 'https://unpkg.com/three@0.123.0/examples/jsm/controls/OrbitControls.js';
-import { PointerLockControls } from 'https://unpkg.com/three@0.123.0/examples/jsm/controls/PointerLockControls.js';
 
 import Controls from './controls.js';
 import { controlTypes } from './controls.js'
@@ -27,8 +16,7 @@ animate();
 
 function init() {
 
-    container = document.createElement('div');
-    document.body.appendChild(container);
+    container = document.querySelector('#scene-container');
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
     camera.position.set(100, 200, 300);
@@ -49,8 +37,6 @@ function init() {
     light.shadow.camera.left = - 120;
     light.shadow.camera.right = 120;
     scene.add(light);
-
-    // scene.add( new CameraHelper( light.shadow.camera ) );
 
     // ground
     var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2000, 2000), new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: false }));
@@ -91,17 +77,16 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
-    container.appendChild(renderer.domElement);
+    container.append(renderer.domElement);
 
-    //controls = new Controls(controlTypes.ORBIT, camera, renderer.body);
-    controls = new Controls(controlTypes.POINTERLOCK, camera, renderer.body);
+    controls = new Controls(controlTypes.ORBIT, camera, renderer.body);
+    //controls = new Controls(controlTypes.POINTERLOCK, camera, renderer.body);
 
     window.addEventListener('resize', onWindowResize, false);
-    //changeWindowSize(393,729);
 
     // stats
     stats = new Stats();
-    container.appendChild(stats.dom);
+    document.body.appendChild( stats.domElement );
 }
 
 function onWindowResize() {

@@ -2,16 +2,55 @@
 <html>
 
 <head>
-	<title>WebViewer</title>
-	<meta charset="utf-8">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"
+		rel="stylesheet" />
+	<link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/style.css" type="text/css">
+
+	<title>WebViewer</title>
 </head>
 
 <body>
-	<script src="https://unpkg.com/three@0.123.0/build/three.js"></script>
-	
-	<script type="module" src="js/character_loader.js"></script>
+	<div id="app">
+		<v-app>
+			<v-card height="400" width="256" class="menu" color="rgb(0, 0, 0, 0.3)">
+				<v-navigation-drawer dark floating permanent color="transparent">
+					<v-list dense rounded>
+						<v-list-item-content>
+							<!-- ASSET 1 -->
+							<v-btn dark>
+								Asset
+								<v-icon dark right>
+									mdi-cloud-upload
+								</v-icon>
+							</v-btn>
+						</v-list-item-content>
+
+						<v-list-item-content>
+							<!-- ASSET 2 -->
+							<v-btn dark>
+								Asset
+								<v-icon dark right>
+									mdi-cloud-upload
+								</v-icon>
+							</v-btn>
+						</v-list-item-content>
+					</v-list>
+				</v-navigation-drawer>
+			</v-card>
+
+			<div id="scene-container"></div>
+		</v-app>
+	</div>
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+<script src="https://unpkg.com/three@0.123.0/build/three.js"></script>
+<script type="module" src="js/character_loader.js"></script>
+<script src="js/app.js?ts=1"></script>
 
 </html>
