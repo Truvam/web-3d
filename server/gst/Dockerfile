@@ -164,7 +164,7 @@ RUN \
 
 # WebRTC APP START
 RUN \
-    pip3 install websockets xlib gputil python-uinput prometheus_client msgpack pynput
+    pip3 install websockets xlib gputil python-uinput prometheus_client msgpack pynput ewmh
 
 RUN \
     apt-get update && apt-get install -y \
