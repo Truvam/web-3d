@@ -15,14 +15,14 @@ export default class Controls {
         this.controls = NaN;
 
         this.creatControl();
-        this.setEvents();
-
     }
 
     creatControl() {
         if (this.type == controlTypes.POINTERLOCK) {
             this.controls = new PointerLockControls(this.camera, this.domElement);
             this.camera.position.set(0, 100, 300);
+
+            this.setEvents();
         }
         else if (this.type == controlTypes.ORBIT) {
             this.controls = new OrbitControls(this.camera, this.domElement);
@@ -33,7 +33,7 @@ export default class Controls {
 
     handleEvents = e => {
         console.log(e)
-        switch ( e.type ) {
+        switch (e.type) {
             case 'click':
                 this.controls.lock();
                 break;
