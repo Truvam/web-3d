@@ -16,29 +16,96 @@
 <body>
 	<div id="app">
 		<v-app>
-			<v-card height="400" width="256" class="menu" color="rgb(0, 0, 0, 0.3)">
+			<v-card class="menu" color="rgb(0, 0, 0, 0.3)">
 				<v-navigation-drawer dark floating permanent color="transparent">
-					<v-list dense rounded>
-						<v-list-item-content>
-							<!-- ASSET 1 -->
-							<v-btn dark>
-								Asset
-								<v-icon dark right>
-									mdi-cloud-upload
-								</v-icon>
-							</v-btn>
-						</v-list-item-content>
 
-						<v-list-item-content>
-							<!-- ASSET 2 -->
-							<v-btn dark>
-								Asset
-								<v-icon dark right>
-									mdi-cloud-upload
-								</v-icon>
-							</v-btn>
-						</v-list-item-content>
-					</v-list>
+					<v-subheader>Body</v-subheader>
+					<v-toolbar dense rounded>
+
+						<!-- ASSET 1 -->
+						<v-btn dark @click.native="loadAsset(0)">
+							Asset 1
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+						<!-- ASSET 2 -->
+						<v-btn dark @click.native="loadAsset(1)">
+							Asset 2
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+					</v-toolbar>
+
+					<v-divider></v-divider>
+
+					<v-subheader>Garment</v-subheader>
+					<!-- TOP -->
+					<v-toolbar dense rounded>
+
+						<!-- ASSET 1 -->
+						<v-btn dark @click.native="loadAsset(2)">
+							Asset 3
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+						<!-- ASSET 2 -->
+						<v-btn dark @click.native="loadAsset(3)">
+							Asset 4
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+					</v-toolbar>
+
+					<!-- BOTTOM -->
+					<v-toolbar dense rounded>
+
+						<!-- ASSET 1 -->
+						<v-btn dark @click.native="loadAsset(4)">
+							Asset 5
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+						<!-- ASSET 2 -->
+						<v-btn dark @click.native="loadAsset(5)">
+							Asset 6
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+					</v-toolbar>
+
+					<!-- SHOES -->
+					<v-toolbar dense rounded>
+
+						<!-- ASSET 1 -->
+						<v-btn dark @click.native="loadAsset(6)">
+							Asset 7
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+						<!-- ASSET 2 -->
+						<v-btn dark @click.native="loadAsset(7)">
+							Asset 8
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+					</v-toolbar>
+
 				</v-navigation-drawer>
 			</v-card>
 
@@ -50,7 +117,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 <script src="https://unpkg.com/three@0.123.0/build/three.js"></script>
-<script type="module" src="js/character_loader.js"></script>
+<script type="module" src="js/scene.js"></script>
 <script src="js/app.js?ts=1"></script>
 
 </html>
