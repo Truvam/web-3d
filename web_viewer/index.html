@@ -16,8 +16,15 @@
 <body>
 	<div id="app">
 		<v-app>
+			<v-toolbar dense absolute class="settings" color="transparent" elevation="0">
+				<v-switch v-if="showToolbar" dense v-model="showUI" label="UI" hide-details></v-switch>
+				<v-btn icon @click.stop="showToolbar = !showToolbar">
+					<v-icon>mdi-settings</v-icon>
+				</v-btn>
+			</v-toolbar>
+
 			<v-card class="menu" color="rgb(0, 0, 0, 0.3)">
-				<v-navigation-drawer dark floating permanent color="transparent">
+				<v-navigation-drawer v-if="showUI" dark floating permanent color="transparent">
 
 					<v-subheader>Body</v-subheader>
 					<v-toolbar dense rounded>

@@ -14,12 +14,10 @@ body {
     /* Firefox */
 }
 
-#scene-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+.settings {
+    top: 65%;
+    right: 1%;
 }
-
 
 .menu {
     position: absolute;
@@ -27,6 +25,12 @@ body {
     left: 10%;
     transform: translate(-50%, -50%);
     z-index: 2;
+}
+
+#scene-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
 }
 
 .v-navigation-drawer {
