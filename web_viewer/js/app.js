@@ -10,7 +10,8 @@ var app = new Vue({
         ],
 
         showToolbar: false,
-        showUI: true
+        showUI: true,
+        showStats: true
     },
 
     components: {
@@ -26,6 +27,15 @@ var app = new Vue({
     },
 
     watch: {
+        showStats(newValue) {
+            var stats = document.getElementById("stats-container");
+            if (newValue) {
+                stats.style.display = "block";
+            }
+            else {
+                stats.style.display = "none";
+            }
+        }
     }
 })
 

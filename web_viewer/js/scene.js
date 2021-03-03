@@ -68,7 +68,8 @@ function init() {
 
     // stats
     stats = new Stats();
-    document.body.appendChild(stats.domElement);
+    var stats_container = document.querySelector('#stats-container');
+    stats_container.append(stats.domElement);
 }
 
 function onWindowResize() {

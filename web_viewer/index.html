@@ -17,7 +17,10 @@
 	<div id="app">
 		<v-app>
 			<v-toolbar dense absolute class="settings" color="transparent" elevation="0">
+				<v-switch v-if="showToolbar" dense v-model="showStats" label="Stats" hide-details></v-switch>
+				
 				<v-switch v-if="showToolbar" dense v-model="showUI" label="UI" hide-details></v-switch>
+				
 				<v-btn icon @click.stop="showToolbar = !showToolbar">
 					<v-icon>mdi-settings</v-icon>
 				</v-btn>
@@ -115,6 +118,8 @@
 
 				</v-navigation-drawer>
 			</v-card>
+
+			<div id="stats-container"></div>
 
 			<div id="scene-container"></div>
 		</v-app>
