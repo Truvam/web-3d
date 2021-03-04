@@ -61,7 +61,7 @@ function init() {
     renderer.shadowMap.enabled = true;
     container.append(renderer.domElement);
 
-    controls = new Controls(controlTypes.ORBIT, camera, renderer.body);
+    controls = new Controls(controlTypes.ORBIT, camera, container);
     //controls = new Controls(controlTypes.POINTERLOCK, camera, renderer.body);
 
     window.addEventListener('resize', onWindowResize, false);
