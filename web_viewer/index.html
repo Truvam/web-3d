@@ -18,22 +18,22 @@
 		<v-app>
 			<v-toolbar dense absolute class="settings" color="transparent" elevation="0">
 				<v-switch v-if="showToolbar" dense v-model="showStats" label="Stats" hide-details></v-switch>
-				
+
 				<v-switch v-if="showToolbar" dense v-model="showUI" label="UI" hide-details></v-switch>
-				
+
 				<v-btn icon @click.stop="showToolbar = !showToolbar">
 					<v-icon>mdi-settings</v-icon>
 				</v-btn>
 			</v-toolbar>
 
-			<v-card class="menu" color="rgb(0, 0, 0, 0.3)">
-				<v-navigation-drawer v-if="showUI" dark floating permanent color="transparent">
+			<v-card class="asset-menu" color="rgb(0, 0, 0, 0.3)" dark width="265">
+				<v-navigation-drawer v-if="showUI" floating permanent color="transparent">
 
-					<v-subheader>Body</v-subheader>
-					<v-toolbar dense rounded>
+					<v-subheader>SELECT BODY TYPE</v-subheader>
+					<v-toolbar dense flat color="transparent">
 
 						<!-- ASSET 1 -->
-						<v-btn dark @click.native="loadAsset(0)">
+						<v-btn color="indigo" @click.native="loadAsset(0)">
 							Asset 1
 							<v-icon dark right>
 								mdi-cloud-upload
@@ -41,7 +41,7 @@
 						</v-btn>
 
 						<!-- ASSET 2 -->
-						<v-btn dark @click.native="loadAsset(1)">
+						<v-btn color="indigo" @click.native="loadAsset(1)">
 							Asset 2
 							<v-icon dark right>
 								mdi-cloud-upload
@@ -52,21 +52,11 @@
 
 					<v-divider></v-divider>
 
-					<v-subheader>Garment</v-subheader>
-					<!-- TOP -->
-					<v-toolbar dense rounded>
+					<v-subheader>PRESETS</v-subheader>
+					<v-toolbar dense flat color="transparent">
 
-						<!-- ASSET 1 -->
-						<v-btn dark @click.native="loadAsset(2)">
-							Asset 3
-							<v-icon dark right>
-								mdi-cloud-upload
-							</v-icon>
-						</v-btn>
-
-						<!-- ASSET 2 -->
-						<v-btn dark @click.native="loadAsset(3)">
-							Asset 4
+						<v-btn color="indigo" @click.native="loadAsset(2)">
+							PRESET 1
 							<v-icon dark right>
 								mdi-cloud-upload
 							</v-icon>
@@ -74,20 +64,10 @@
 
 					</v-toolbar>
 
-					<!-- BOTTOM -->
-					<v-toolbar dense rounded>
+					<v-toolbar dense flat color="transparent">
 
-						<!-- ASSET 1 -->
-						<v-btn dark @click.native="loadAsset(4)">
-							Asset 5
-							<v-icon dark right>
-								mdi-cloud-upload
-							</v-icon>
-						</v-btn>
-
-						<!-- ASSET 2 -->
-						<v-btn dark @click.native="loadAsset(5)">
-							Asset 6
+						<v-btn color="indigo" @click.native="loadAsset(3)">
+							PRESET 2
 							<v-icon dark right>
 								mdi-cloud-upload
 							</v-icon>
@@ -95,20 +75,10 @@
 
 					</v-toolbar>
 
-					<!-- SHOES -->
-					<v-toolbar dense rounded>
+					<v-toolbar dense flat color="transparent">
 
-						<!-- ASSET 1 -->
-						<v-btn dark @click.native="loadAsset(6)">
-							Asset 7
-							<v-icon dark right>
-								mdi-cloud-upload
-							</v-icon>
-						</v-btn>
-
-						<!-- ASSET 2 -->
-						<v-btn dark @click.native="loadAsset(7)">
-							Asset 8
+						<v-btn color="indigo" @click.native="loadAsset(4)">
+							PRESET 3
 							<v-icon dark right>
 								mdi-cloud-upload
 							</v-icon>
@@ -116,6 +86,37 @@
 
 					</v-toolbar>
 
+					<v-toolbar dense flat color="transparent">
+
+						<v-btn color="indigo" @click.native="loadAsset(5)">
+							PRESET 4
+							<v-icon dark right>
+								mdi-cloud-upload
+							</v-icon>
+						</v-btn>
+
+					</v-toolbar>
+				</v-navigation-drawer>
+			</v-card>
+
+			<v-card class="customize-menu" color="rgb(0, 0, 0, 0.3)" dark>
+				<v-navigation-drawer v-if="showUI" floating permanent color="transparent">
+					<!-- This could be either sliders, radio or buttons -->
+					<v-subheader>HEAD</v-subheader>
+					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always"
+						tick-size="4"></v-slider>
+
+					<v-subheader>SHIRT</v-subheader>
+					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always"
+						tick-size="4"></v-slider>
+
+					<v-subheader>PANTS</v-subheader>
+					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always"
+						tick-size="4"></v-slider>
+
+					<v-subheader>SHOES</v-subheader>
+					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always"
+						tick-size="4"></v-slider>
 				</v-navigation-drawer>
 			</v-card>
 

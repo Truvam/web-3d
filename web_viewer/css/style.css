@@ -19,10 +19,18 @@ body {
     right: 0%;
 }
 
-.menu {
+.asset-menu {
     position: absolute;
     top: 50%;
     left: 10%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.customize-menu {
+    position: absolute;
+    top: 50%;
+    left: 90%;
     transform: translate(-50%, -50%);
     z-index: 2;
 }

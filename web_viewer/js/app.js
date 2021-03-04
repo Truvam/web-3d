@@ -11,7 +11,13 @@ var app = new Vue({
 
         showToolbar: false,
         showUI: true,
-        showStats: true
+        showStats: true,
+        ticksLabels: [
+            'Style1',
+            'Style2',
+            'Style2',
+            'Style3',
+        ]
     },
 
     components: {
