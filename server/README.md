@@ -9,7 +9,7 @@ Based on:
 ### GStreamer WebRTC Pipeline
 Running on docker (recommended):
 ```
-docker build -t server-gst --network=host .
+docker build -t server-gst .
 ```
 ```
 docker run -it --rm --gpus all --network=host -e ENCODER=nvh264enc -e APP_NAME=WebViewer server-gst
@@ -22,16 +22,6 @@ Manually:
 ### Signalling
 ```
 ./simple_server.py --disable-ssl
-```
-
-### Start Firefox
-```
-firefox --kiosk http://localhost:8181/
-```
-
-### Start Chrome (Chrome has better performance, need to check why)
-```
-google-chrome --start-fullscreen --app=http://localhost:8181
 ```
 
 ## Detect X Window ID
