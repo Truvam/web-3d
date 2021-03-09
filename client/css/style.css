@@ -1,16 +1,9 @@
 html {
     font-family: Roboto, Arial, sans;
-}
-
-.scrolly textarea {
-    min-height: 300px;
-    white-space: pre;
-    overflow: scroll;
-}
-
-.fab-container {
-    top: 50%;
-    right: -25px;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
 }
 
 .video-container {
@@ -40,6 +33,16 @@ html {
     margin-top: 1em;
 }
 
-canvas {
-    background: black;
+.toolbar {
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.v-navigation-drawer {
+    will-change: initial;
+}
+
+::-webkit-scrollbar {
+    display: none;
 }

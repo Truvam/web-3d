@@ -2,269 +2,259 @@
 <html>
 
 <head>
-  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/vuetify/1.5.14/vuetify.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" type="text/css">
-  <title>WebRTC</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+    <meta name="theme-color" content="black" />
+
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <title>WebRTC</title>
 </head>
 
 <body>
-  <div id="app">
-    <v-app>
-      <v-navigation-drawer v-model="showDrawer" app fixed right temporary width="600">
-        <v-container fluid grid-list-lg>
-          <v-layout row wrap>
-            <v-flex xs12>
-              <p>
-                <v-toolbar>
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
-                        :width="4"
-                        :value="videoBitRate === 0 ? 0 : (connectionVideoBitrate / (videoBitRate / 1000))*100"
-                        color="teal">
-                        {{ connectionVideoBitrate }}
-                      </v-progress-circular>
-                    </template>
-                    <span>Current video bit rate in mbps vs selected bit rate {{ (videoBitRate / 1000).toFixed(0) }}
-                      mbps</span>
-                  </v-tooltip>
+    <div id="app">
+        <v-app>
+            <v-toolbar dark floating absolute class="toolbar">
+                <v-app-bar-nav-icon @click.stop="showDrawer = !showDrawer"></v-app-bar-nav-icon>
 
-                  <v-tooltip bottom>
+                <v-spacer></v-spacer>
+
+                <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                      <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
-                        :width="4" :value="(connectionFrameRate / 60)*100" color="blue-grey">
-                        {{ connectionFrameRate }}
-                      </v-progress-circular>
+                        <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
+                            :width="4"
+                            :value="videoBitRate === 0 ? 0 : (connectionVideoBitrate / (videoBitRate / 1000))*100"
+                            color="teal">
+                            {{ connectionVideoBitrate }}
+                        </v-progress-circular>
+                    </template>
+                    <span>Current video bit rate in mbps vs selected bit rate {{ (videoBitRate /
+                        1000).toFixed(0) }}
+                        mbps</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
+                            :width="4" :value="(connectionFrameRate / 60)*100" color="blue-grey">
+                            {{ connectionFrameRate }}
+                        </v-progress-circular>
                     </template>
                     <span>Current FPS vs 60 FPS</span>
-                  </v-tooltip>
+                </v-tooltip>
 
-                  <v-tooltip bottom>
+                <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                      <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
-                        :width="4" :value="(connectionLatency / 1000)*100" color="red">
-                        {{ connectionLatency }}
-                      </v-progress-circular>
+                        <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
+                            :width="4" :value="(connectionLatency / 1000)*100" color="red">
+                            {{ connectionLatency }}
+                        </v-progress-circular>
                     </template>
                     <span>Current max(video, audio) latency in milliseconds</span>
-                  </v-tooltip>
+                </v-tooltip>
 
-                  <v-divider class="mr-1" vertical></v-divider>
-
-                  <v-tooltip bottom>
+                <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                      <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
-                        :width="4" :value="gpuLoad" color="blue">
-                        {{ gpuLoad }}
-                      </v-progress-circular>
+                        <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
+                            :width="4" :value="gpuLoad" color="blue">
+                            {{ gpuLoad }}
+                        </v-progress-circular>
                     </template>
                     <span>Current GPU load</span>
-                  </v-tooltip>
+                </v-tooltip>
 
-                  <v-tooltip bottom>
+                <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                      <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
-                        :width="4" :value="gpuMemoryTotal === 0 ? 0 : (gpuMemoryUsed / gpuMemoryTotal) * 100"
-                        color="blue-grey">
-                        {{ (gpuMemoryUsed / 1024).toFixed(2) }}
-                      </v-progress-circular>
+                        <v-progress-circular class="mx-2" v-on="on" :rotate="360" :size="50" style="font-size: 10"
+                            :width="4" :value="gpuMemoryTotal === 0 ? 0 : (gpuMemoryUsed / gpuMemoryTotal) * 100"
+                            color="blue-grey">
+                            {{ (gpuMemoryUsed / 1024).toFixed(2) }}
+                        </v-progress-circular>
                     </template>
-                    <span>Current GPU memory GB used of the {{ (gpuMemoryTotal / 1024).toFixed(0) }}GB available</span>
-                  </v-tooltip>
+                    <span>Current GPU memory GB used of the {{ (gpuMemoryTotal / 1024).toFixed(0)
+                        }}GB available</span>
+                </v-tooltip>
 
-                  <v-divider class="mr-1" vertical></v-divider>
-
-                  <v-tooltip bottom>
+                <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                      <v-btn icon v-on:click="enterFullscreen()">
-                        <v-icon color="black" v-on="on">fullscreen</v-icon>
-                      </v-btn>
+                        <v-btn icon v-on:click="enterFullscreen()">
+                            <v-icon color="black" v-on="on">fullscreen</v-icon>
+                        </v-btn>
                     </template>
                     <span>Enter fullscreen mode (CTRL+SHIFT+F)</span>
-                  </v-tooltip>
+                </v-tooltip>
 
-                  <v-tooltip bottom v-if="clipboardStatus === 'enabled'">
+                <v-tooltip bottom v-if="clipboardStatus === 'enabled'">
                     <template v-slot:activator="{ on }">
-                      <v-btn block icon>
-                        <v-icon color="black" v-on="on">file_copy</v-icon>
-                      </v-btn>
+                        <v-btn icon>
+                            <v-icon color="black" v-on="on">file_copy</v-icon>
+                        </v-btn>
                     </template>
                     <span>Clipboard status: {{ clipboardStatus }}</span>
-                  </v-tooltip>
+                </v-tooltip>
 
-                  <v-tooltip bottom v-else>
+                <v-tooltip bottom v-else>
                     <template v-slot:activator="{ on }">
-                      <v-btn block icon v-on:click="enableClipboard()">
-                        <v-icon color="blue" v-on="on">file_copy</v-icon>
-                      </v-btn>
+                        <v-btn icon v-on:click="enableClipboard()">
+                            <v-icon color="blue" v-on="on">file_copy</v-icon>
+                        </v-btn>
                     </template>
                     <span>Enable clipboard access</span>
-                  </v-tooltip>
+                </v-tooltip>
+            </v-toolbar>
 
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <v-btn icon href="/">
-                        <v-icon color="black" v-on="on">home</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Return to launcher</span>
-                  </v-tooltip>
+            <v-navigation-drawer v-model="showDrawer" absolute bottom temporary dark>
+                <v-list-item>
+                    <v-list-item-content>
+                        <v-list-item-title class="title">
+                            Settings
+                        </v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
 
-                  <v-tooltip bottom v-if="gamepadState === 'connected'">
-                    <template v-slot:activator="{ on }">
-                      <v-icon color="black" v-on="on">videogame_asset</v-icon>
-                    </template>
-                    <span>Gamepad connected: {{ gamepadName }}</span>
-                  </v-tooltip>
+                <v-divider></v-divider>
 
-                  <v-tooltip bottom v-else>
-                    <template v-slot:activator="{ on }">
-                      <v-icon color="grey" v-on="on">videogame_asset</v-icon>
-                    </template>
-                    <span>Gamepad disconnected</span>
-                  </v-tooltip>
+                <v-list dense nav>
+                    <v-list-item-group>
+                        <v-list-item>
+                            <v-select :items="videoBitRateOptions" label="Video bit rate" menu-props="left"
+                                v-model="videoBitRate" hint="Dynamic bit rate selection for hardware encoder on server"
+                                persistent-hint>
+                            </v-select>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-select :items="videoFramerateOptions" label="Video frame rate" menu-props="left"
+                                v-model="videoFramerate" hint="Frame rate selection, will reload window on change"
+                                persistent-hint>
+                            </v-select>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-select :items="audioBitRateOptions" label="Audio bit rate" menu-props="left"
+                                v-model="audioBitRate" :disabled="!audioEnabled"
+                                hint="Dynamic bit rate selection for audio encoder on server" persistent-hint>
+                            </v-select>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-select :items="windowResolutionOptions" label="Window Resolution" menu-props="left"
+                                v-model="windowResolution"
+                                hint="Window resolution selection, will reload window on change" persistent-hint>
+                            </v-select>
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
 
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <v-icon class="ml-2" color="black" v-on="on">account_circle</v-icon>
-                    </template>
-                    <span>Logged in as {{ getUsername() }} </span>
-                  </v-tooltip>
-                </v-toolbar>
-              </p>
-              <p>
-                <v-select :items="videoBitRateOptions" label="Video bit rate" menu-props="left" v-model="videoBitRate"
-                  hint="Dynamic bit rate selection for hardware encoder on server" persistent-hint></v-select>
-              </p>
-              <p>
-                <v-select :items="videoFramerateOptions" label="Video frame rate" menu-props="left"
-                  v-model="videoFramerate" hint="Frame rate selection, will reload window on change" persistent-hint>
-                </v-select>
-              </p>
-              <p>
-                <v-select :items="audioBitRateOptions" label="Audio bit rate" menu-props="left" v-model="audioBitRate"
-                  :disabled="!audioEnabled" hint="Dynamic bit rate selection for audio encoder on server"
-                  persistent-hint>
-                </v-select>
-              </p>
-              <p>
-                <v-select :items="windowResolutionOptions" label="Window Resolution" menu-props="left"
-                  v-model="windowResolution" hint="Window resolution selection, will reload window on change"
-                  persistent-hint>
-                </v-select>
-              </p>
-              <p>
-                Signalling Stats:
-              <ul>
-                <li>Peer connection state: <b>{{ status }}</b></li>
-                <li>Peer connection type: <b>{{ connectionStatType }}</b></li>
-                <li>Packets received: <b>{{ connectionPacketsReceived }}</b></li>
-                <li>Packets lost: <b>{{ connectionPacketsLost }}</b></li>
-              </ul>
-              Bandwidth Stats:
-              <ul>
-                <li>Video receive rate: <b>{{ connectionVideoBitrate }} mbps</b></li>
-                <li>Available receive bandwith: <b>{{ connectionAvailableBandwidth }}</b></li>
-              </ul>
-              Video Stats
-              <ul>
-                <li>Latency: <b>{{ connectionVideoLatency }} ms</b></li>
-                <li>Video: <b>{{ connectionCodec }} {{ connectionResolution }}</b></li>
-                <li>Window size: <b>{{ currentWindowResolution[0] }}x{{ currentWindowResolution[1] }}</b></li>
-                <li>Video decoder: <b>{{ connectionVideoDecoder }}</b></li>
-                <li>Frame rate: <b>{{ connectionFrameRate }} fps</b></li>
-                <li>Bit rate: <b>{{ connectionVideoBitrate }} mbps</b></li>
-              </ul>
-              Audio Stats
-              <ul>
-                <li>Latency: <b>{{ connectionAudioLatency }} ms</b></li>
-                <li>Codec: <b>{{ connectionAudioCodecName }}</b></li>
-                <li>Bit rate: <b>{{ connectionAudioBitrate }} kbps</b></li>
-              </ul>
-              </p>
-              <hr />
-              <v-textarea bottom class="scrolly" label="Status Logs" readonly :value="logEntries.join('\n\n')">
-              </v-textarea>
-              <v-textarea bottom class="scrolly" label="Debug Logs" readonly :value="debugEntries.join('\n\n')">
-              </v-textarea>
-              <p>
-                <v-btn color="primary" v-if="!audioEnabled" small v-on:click="audioEnabled=true">Enable Audio</v-btn>
-                <v-btn color="primary" v-else small v-on:click="audioEnabled=false">Disable Audio</v-btn>
-              </p>
-              <p>
-                Debugging
-                <v-switch v-model="debug" :label="`Debug logs: ${debug.toString()}`"></v-switch>
-                <v-switch v-model="turnSwitch" :label="`Force relay connection: ${turnSwitch.toString()}`"></v-switch>
-              </p>
+                <v-list>
+                    <v-list-group :value="true">
+                        <template v-slot:activator>
+                            <v-list-item-title>Connection Information</v-list-item-title>
+                        </template>
+                        <v-divider></v-divider>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>Signalling Stats:</v-list-item-title>
 
-              <p v-if="publishingAllowed">
-                Publishing
+                                <v-list-item-subtitle>
+                                    Peer connection state: <b>{{ status }}</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Peer connection type: <b>{{ connectionStatType }}</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Packets received: <b>{{ connectionPacketsReceived }}</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Packets lost: <b>{{ connectionPacketsLost }}</b>
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>Bandwidth Stats:</v-list-item-title>
 
-              <div v-if="publishingIdle">
-                <v-form v-model="publishingValid">
-                  <v-text-field label="New app name" :placeholder="`${app.appName}-sandbox`"
-                    :rules="[rules.required, rules.validname]" v-model="publishingAppName">
-                  </v-text-field>
+                                <v-list-item-subtitle>
+                                    Video receive rate: <b>{{ connectionVideoBitrate }} mbps</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Available receive bandwith: <b>{{ connectionAvailableBandwidth }}</b>
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>Video Stats:</v-list-item-title>
 
-                  <v-text-field label="New app display name" :placeholder="`${app.appName}-sandbox`"
-                    v-model="publishingAppDisplayName">
-                  </v-text-field>
+                                <v-list-item-subtitle>
+                                    Latency: <b>{{ connectionVideoLatency }} ms</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Video: <b>{{ connectionCodec }} {{ connectionResolution }}</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Window size: <b>{{ currentWindowResolution[0] }}x{{ currentWindowResolution[1]
+                                        }}</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Video decoder: <b>{{ connectionVideoDecoder }}</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Frame rate: <b>{{ connectionFrameRate }} fps</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Bit rate: <b>{{ connectionVideoBitrate }} mbps</b>
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>Audio Stats:</v-list-item-title>
 
-                  <v-text-field label="New app description" :placeholder="`Created from ${app.appName}`"
-                    v-model="publishingAppDescription">
-                  </v-text-field>
+                                <v-list-item-subtitle>
+                                    Latency: <b>{{ connectionAudioLatency }} ms</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Codec: <b>{{ connectionAudioCodecName }}</b>
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle>
+                                    Bit rate: <b>{{ connectionAudioBitrate }} kbps</b>
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list-group>
+                </v-list>
+            </v-navigation-drawer>
 
-                  <v-text-field label="URL to app icon" v-model="publishingAppIcon">
-                  </v-text-field>
-                </v-form>
+            <div id="video_container" class="video-container">
+                <video id="stream" preload="none" playsinline>
+                    Your browser doesn't support video
+                </video>
+            </div>
 
-                <v-btn color="primary" small v-on:click="publish()" :disabled="!publishingValid">Publish</v-btn>
-              </div>
-              <div v-else>
-                <v-progress-circular v-if="publishingAllowed" indeterminate :size="50" :width="4" color="primary">
-                </v-progress-circular>
-              </div>
-              </p>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-navigation-drawer>
-
-      <div id="video_container" class="video-container">
-        <video id="stream" preload="none" playsinline>
-          Your browser doesn't support video
-        </video>
-      </div>
-
-      <canvas id="capture"></canvas>
-
-      <v-btn class="fab-container" v-on:click="showDrawer=!showDrawer" color="grey" fab dark fixed right>
-        <v-icon>chevron_left</v-icon>
-      </v-btn>
-
-      <div class="loading">
-        <div v-if="status === 'failed'">
-          <v-btn v-on:click="location.reload()" color="#E0E0E0">
-            reload</v-btn>
-          <div class="loading-text">Connection failed.</div>
-        </div>
-        <div v-else>
-          <scale-loader size="200px" :loading="(status !== 'connected')" color="#E0E0E0"></scale-loader>
-          <div v-if="(status !== 'connected')" class="loading-text">{{ loadingText }}</div>
-          <v-btn v-if="(status === 'connected' && showStart)" v-on:click="playVideo()" color="#E0E0E0">
-            start</v-btn>
-        </div>
-      </div>
-    </v-app>
-  </div>
+            <div class="loading">
+                <div v-if="status === 'failed'">
+                    <v-btn v-on:click="location.reload()" color="#E0E0E0">
+                        reload</v-btn>
+                    <div class="loading-text">Connection failed.</div>
+                </div>
+                <div v-else>
+                    <scale-loader size="200px" :loading="(status !== 'connected')" color="#E0E0E0"></scale-loader>
+                    <div v-if="(status !== 'connected')" class="loading-text">{{ loadingText }}</div>
+                    <v-btn v-if="(status === 'connected' && showStart)" v-on:click="playVideo()" color="#E0E0E0">
+                        start</v-btn>
+                </div>
+            </div>
+        </v-app>
+    </div>
 </body>
 
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apache-guacamole-client@0.9.14/dist/guacamole.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.9/vue.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vuetify/1.5.14/vuetify.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.3/dist/vue-spinner.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
 <script src="js/gamepad.js?ts=1"></script>
 <script src="js/input.js?ts=1"></script>
 <script src="js/signalling.js?ts=1"></script>
