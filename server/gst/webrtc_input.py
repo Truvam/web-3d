@@ -387,7 +387,7 @@ class WebRTCInput:
             logger.info("Changing window size to: " +
                         str(width) + "x" + str(height))
 
-            window.configure(width=width, height=height)
+            self.window.configure(width=width, height=height)
             self.xdisplay.sync()
 
     def on_message(self, msg):
