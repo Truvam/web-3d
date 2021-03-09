@@ -1,4 +1,5 @@
 
+
 var app = new Vue({
     el: '#app',
     vuetify: new Vuetify(),
@@ -12,6 +13,7 @@ var app = new Vue({
         showToolbar: false,
         showUI: true,
         showStats: true,
+        changeControlType: false,
         ticksLabels: [
             'Style1',
             'Style2',
@@ -40,6 +42,15 @@ var app = new Vue({
             }
             else {
                 stats.style.display = "none";
+            }
+        },
+
+        changeControlType(newValue) {
+            if (newValue) {
+                this.$changeControlType(this.$controlTypes.POINTERLOCK);
+            }
+            else {
+                this.$changeControlType(this.$controlTypes.ORBIT);
             }
         }
     }

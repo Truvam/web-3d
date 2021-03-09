@@ -62,7 +62,6 @@ function init() {
     container.append(renderer.domElement);
 
     controls = new Controls(controlTypes.ORBIT, camera, container);
-    //controls = new Controls(controlTypes.POINTERLOCK, camera, renderer.body);
 
     window.addEventListener('resize', onWindowResize, false);
 
@@ -102,4 +101,18 @@ function animate() {
 function loadAsset(url) {
     loader.load(scene, url)
 }
+
+function changeControlType(controlType) {
+    if (controlType == controlTypes.POINTERLOCK) {
+        controls = new Controls(controlTypes.POINTERLOCK, camera, container);
+
+    }
+    else {
+        controls.clearEvents();
+        controls = new Controls(controlTypes.ORBIT, camera, container);
+    }
+}
+
 Vue.prototype.$loader = loadAsset;
+Vue.prototype.$controlTypes = controlTypes;
+Vue.prototype.$changeControlType = changeControlType;

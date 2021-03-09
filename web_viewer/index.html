@@ -17,6 +17,8 @@
 	<div id="app">
 		<v-app>
 			<v-toolbar dense absolute class="settings" color="transparent" elevation="0">
+				<v-switch v-if="showToolbar" dense v-model="changeControlType" label="PointerLock" hide-details></v-switch>
+
 				<v-switch v-if="showToolbar" dense v-model="showStats" label="Stats" hide-details></v-switch>
 
 				<v-switch v-if="showToolbar" dense v-model="showUI" label="UI" hide-details></v-switch>
@@ -103,20 +105,16 @@
 				<v-navigation-drawer v-if="showUI" floating permanent color="transparent">
 					<!-- This could be either sliders, radio or buttons -->
 					<v-subheader>HEAD</v-subheader>
-					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always"
-						tick-size="4"></v-slider>
+					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always" tick-size="4"></v-slider>
 
 					<v-subheader>SHIRT</v-subheader>
-					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always"
-						tick-size="4"></v-slider>
+					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always" tick-size="4"></v-slider>
 
 					<v-subheader>PANTS</v-subheader>
-					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always"
-						tick-size="4"></v-slider>
+					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always" tick-size="4"></v-slider>
 
 					<v-subheader>SHOES</v-subheader>
-					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always"
-						tick-size="4"></v-slider>
+					<v-slider :tick-labels="ticksLabels" :max="3" step="1" ticks="always" tick-size="4"></v-slider>
 				</v-navigation-drawer>
 			</v-card>
 
