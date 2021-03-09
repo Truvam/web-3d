@@ -8,32 +8,31 @@ const controlTypes = {
 export { controlTypes };
 
 export default class Controls {
-    constructor(type = controlTypes.POINTERLOCK, camera, domElement = document.body) {
+    constructor(type = controlTypes.POINTERLOCK, camera, domElement) {
         this.type = type;
         this.camera = camera;
         this.domElement = domElement;
-        this.controls = NaN;
+        this.controls = null;
 
         this.creatControl();
-        this.setEvents();
-
     }
 
     creatControl() {
         if (this.type == controlTypes.POINTERLOCK) {
             this.controls = new PointerLockControls(this.camera, this.domElement);
-            this.camera.position.set(0, 100, 300);
+            this.setEvents();
         }
         else if (this.type == controlTypes.ORBIT) {
             this.controls = new OrbitControls(this.camera, this.domElement);
             this.controls.target.set(0, 100, 0);
+            this.controls.rotateSpeed = 1;
             this.controls.update();
         }
     }
 
     handleEvents = e => {
         console.log(e)
-        switch ( e.type ) {
+        switch (e.type) {
             case 'click':
                 this.controls.lock();
                 break;
@@ -41,7 +40,12 @@ export default class Controls {
     }
 
     setEvents() {
-        document.body.addEventListener("click", this.handleEvents);
+        this.domElement.addEventListener("click", this.handleEvents);
+    }
+
+    clearEvents() {
+        this.domElement.removeEventListener("click", this.handleEvents);
+        this.controls.disconnect();
     }
 }
 
