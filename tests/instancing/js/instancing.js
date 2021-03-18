@@ -7,6 +7,7 @@ import { BufferGeometryUtils } from 'https://unpkg.com/three@0.123.0/examples/js
 let container, stats, gui, guiStatsEl;
 let camera, controls, scene, renderer, material;
 
+
 // gui
 
 const Method = {
@@ -15,10 +16,14 @@ const Method = {
 
 const api = {
     method: Method.INSTANCED,
-    count: 1000
+    count: 900
 };
+var count = api.count, poly, time;
 
 //
+
+console.log("COUNT,FPS,POLY,TIME(ms)")
+
 
 init();
 initMesh();
@@ -88,12 +93,12 @@ function initMesh() {
 
             geometry.computeVertexNormals();
 
-            console.time(api.method + ' (build)');
+            var start = window.performance.now();
 
             makeInstanced(geometry);
 
-            console.timeEnd(api.method + ' (build)');
-
+            var end = window.performance.now();
+            time = end - start;
         });
 }
 
@@ -112,9 +117,14 @@ function makeInstanced(geometry) {
     scene.add(mesh);
 
     //
-    console.log("Prev FPS: " + stats.getFrameRate());
-    console.log("COUNT: " + api.count + " TRIANGLES: " + renderer.info.render.triangles);
-    
+
+    // Printing previous count
+    if (poly != undefined)
+        console.log(count + "," + Math.round(stats.getFrameRate()) + "," + poly + "," + time);
+
+    count = api.count;
+    poly = renderer.info.render.triangles;
+
     const geometryByteLength = getGeometryByteLength(geometry);
 
     guiStatsEl.innerHTML = [
@@ -166,7 +176,7 @@ function init() {
     // gui
 
     gui = new GUI();
-    gui.add(api, 'count', 1, 100000).step(1).onChange(initMesh);
+    gui.add(api, 'count', 1, 100000).step(100).onChange(initMesh);
 
     const perfFolder = gui.addFolder('Performance');
 
