@@ -16,7 +16,7 @@ const Method = {
 
 const api = {
     method: Method.INSTANCED,
-    count: 900
+    count: 0
 };
 var count = api.count, poly, time;
 
@@ -176,7 +176,9 @@ function init() {
     // gui
 
     gui = new GUI();
-    gui.add(api, 'count', 1, 100000).step(100).onChange(initMesh);
+    var obj = { add:function(){ api.count+=100 }};
+    gui.add(api, 'count', 0, 100000).step(100).onChange(initMesh);
+    gui.add(obj,'add').onChange(initMesh).name('ADD COUNT');
 
     const perfFolder = gui.addFolder('Performance');
 
